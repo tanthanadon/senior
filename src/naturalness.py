@@ -4,6 +4,8 @@ import re
 import pandas as pd
 # For bash command
 import os
+# Measure compution time
+import time
 
 
 def testWritingToken():
@@ -74,7 +76,7 @@ def createTokenFile(pythonPath, tokenPath, tokenID):
 
 def prepareToken(PATH_PYTHON, PATH_TOKEN, projectName):
     p = PATH_PYTHON
-    q = Path(str(PATH_TOKEN)+projectName+"/")
+    q = Path(str(PATH_TOKEN)+"/"+projectName+"/")
     print(p)
     print(q)
     
@@ -86,6 +88,9 @@ def prepareToken(PATH_PYTHON, PATH_TOKEN, projectName):
     pairDirList = []
     print(PATH_PYTHON)
     for file in files:
+        # Ignore project 'etl-scripts'
+        if(projectName == 'etl-scripts'):
+            continue;
         pairDirList = createTokenFile(file, q, tokenID)
         tokenID = tokenID + 1
         d[pairDirList[0]] = pairDirList[1]
@@ -95,11 +100,13 @@ def prepareToken(PATH_PYTHON, PATH_TOKEN, projectName):
     
 
 def clearBefore(PATH_TOKEN, PATH_FILES):
+    #print(PATH_TOKEN)
+    print(PATH_FILES)
     # Remove all fold files for previous project
-    os.system("rm -v "+str(PATH_FILES)+"/fold*")
-    
+    os.system("rm -vrdf "+str(PATH_FILES)+"/fold*")
+
     # Remove all token files for previous project
-    os.system("rm -v "+str(PATH_FILES)+"/files/*.tokens")
+    os.system("rm -vrdf "+str(PATH_FILES)+"/files/*.tokens")
     
     # Create new directory first
     q = Path(PATH_FILES+"/files")
@@ -107,10 +114,11 @@ def clearBefore(PATH_TOKEN, PATH_FILES):
 
     # Copy all tokens files for next project
     os.system("rsync -rv "+str(PATH_TOKEN)+"*.tokens "+str(q))
+    print("\n############## Clear Before finished #########################")
 
-def calculateEntropy():
+def calculateEntropy(PATH_MITLM):
     # Get into the directory of MIT language model
-    os.chdir("/home/thanadon/Documents/Project/LanguageModel/CacheModelPackage/evaluation")
+    os.chdir(PATH_MITLM+'/evaluation')
     os.system("pwd")
     # Run shell script to calculate entropy for 1-10 grams
     for i in range(1,11):
@@ -124,13 +132,14 @@ def calculateEntropy():
 
 def clearAfter(PATH_OUTPUT, PATH_CSV, projectName):
     # Create new directory for storing csv file for each project
-    os.system("mkdir -p "+str(PATH_CSV))
+    os.system("mkdir -p "+PATH_CSV)
     # Copy summary of results to the original project
-    os.system("rsync -rv "+PATH_OUTPUT+"/summary/ "+str(PATH_CSV))
+    os.system("rsync -rv "+PATH_OUTPUT+"/summary/ "+PATH_CSV)
     # Rename ngram.csv file to project ID
-    Path(PATH_CSV+"ngrams.csv").replace(PATH_CSV+projectName+".csv")
+    Path(PATH_CSV+"/ngrams.csv").replace(PATH_CSV+"/"+projectName+".csv")
     # Remove all summary files for previous project
     os.system("rm -rv "+PATH_OUTPUT+"*")
+    print("\n############## Clear After finished #########################")
 
 def main():
     #testTokenization()
@@ -142,8 +151,8 @@ def main():
     PATH_SAMPLE = Path("../Sample_Projects/").resolve()
     PATH_TOKEN = Path("../all_tokens/").resolve()
     PATH_MITLM = Path("~/CacheModelPackage/").expanduser()
-    PATH_FILES = Path(str(PATH_MITLM)+"/evaluation/data/"+language+"/")
-    PATH_OUTPUT = Path(str(PATH_MITLM)+"/evaluation/results/entropy/"+language+"/")
+    PATH_FILES = Path(str(PATH_MITLM)+"/evaluation/data/"+language+"/").resolve()
+    PATH_OUTPUT = Path(str(PATH_MITLM)+"/evaluation/results/entropy/"+language+"/").resolve()
     PATH_CSV = Path("../all_csv/").resolve()
 
     # Create the main directory for cloning projects
@@ -183,33 +192,39 @@ def main():
         #print(PATH_PYTHON)
         if PATH_PYTHON.is_dir():
             try:
+                
                 # Get the name of project from the directory
                 projectName = str(Path(PATH_PYTHON).parts[-1])
                 #print(projectName)
                 
                 # Prepare tokens of each project
                 d = prepareToken(PATH_PYTHON, PATH_TOKEN, projectName)
-                '''
+                
                 # mapping directories of Python files with the directories of token files
                 df = pd.DataFrame([(k, v) for k, v in d.items()], columns=['pythonPath', 'tokenPath'])
                 #print(df)
                 # convert dataframe to .csv file
                 df.to_csv("mappingPython2Token.csv")
-        
+                
                 # Clear all token files of the previous iteration
-                clearBefore(PATH_TOKEN+projectName+"/", PATH_FILES)
-        
-                calculateEntropy()
+                #rint(PATH_FILES)
+                #clearBefore(str(PATH_TOKEN)+"/"+projectName+"/", str(PATH_FILES))
+                
+                calculateEntropy(str(PATH_MITLM))
 
                 # Clear all csv files of the previous iteration
-                clearAfter(PATH_OUTPUT, PATH_CSV, projectName)
-                '''
+                clearAfter(str(PATH_OUTPUT), str(PATH_CSV), projectName)
+                
+                
             except:
                 continue
                 
         else:
             continue
+        
+        
+        
     
-
+start_time = time.time()
 main()
-
+print("--- %s seconds ---" % (time.time() - start_time))
