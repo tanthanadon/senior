@@ -1,0 +1,1 @@
+from . . io import load def test_load_obs_uvfits ( ) :      assert load . load_obs_uvfits ( <str> )   

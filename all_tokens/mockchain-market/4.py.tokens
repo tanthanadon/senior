@@ -1,0 +1,1 @@
+from twisted . application . reactors import Reactor qt5 = Reactor ( <str> , <str> , <str> )  

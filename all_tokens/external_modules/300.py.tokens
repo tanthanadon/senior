@@ -1,0 +1,1 @@
+from openerp import models , fields class ResCompany ( models . Model ) :      _inherit = <str> structure_id = fields . Many2one ( <str> , string = <str> )   

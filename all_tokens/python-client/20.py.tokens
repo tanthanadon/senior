@@ -1,0 +1,1 @@
+from genestack_client import Application class GroupsUtil ( Application ) :      APPLICATION_ID = <str> def find_group_by_name ( self , name ) :          return self . invoke ( <str> , name )    

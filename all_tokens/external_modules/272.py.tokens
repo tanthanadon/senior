@@ -1,0 +1,1 @@
+from openerp . osv import orm , fields class customer_product_name ( orm . Model ) :      _name = <str> _columns = { <str> : fields . char ( <str> , required = True , size = 255 ) , <str> : fields . many2one ( <str> , <str> , required = True , domain = [ ( <str> , <str> , True ) ] ) , <str> : fields . many2one ( <str> , <str> , required = True ) }   

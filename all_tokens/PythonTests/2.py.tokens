@@ -1,0 +1,1 @@
+from pymouse import PyMouse from time import sleep m = PyMouse ( ) sleep ( 5 ) x , y = m . position ( ) a , b = m . screen_size ( ) m . move ( a / 2 , b / 2 ) sleep ( 2 ) m . move ( x , y ) print ( <str> , x , y ) print ( <str> , a , b ) sleep ( 2 ) m . click ( x , y , 2 )  

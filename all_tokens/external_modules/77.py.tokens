@@ -1,0 +1,1 @@
+from openerp . osv import osv , fields class stock_warehouse_orderpoint ( osv . Model ) :      _inherit = <str> _columns = { <str> : fields . date ( <str> ) , <str> : fields . date ( <str> ) , }   

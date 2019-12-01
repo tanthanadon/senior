@@ -1,0 +1,1 @@
+from odoo import models , fields class CarepointBackend ( models . Model ) :      _inherit = <str> manage_product_description = fields . Boolean ( default = True , help = <str> <str> , ) website_product_template_id = fields . Many2one ( string = <str> , comodel_name = <str> , )   

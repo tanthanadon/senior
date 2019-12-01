@@ -1,0 +1,1 @@
+class LibFromPythonPath ( object ) : 	 def MyLib ( self ) : 		 print ( <str> )     

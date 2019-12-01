@@ -1,0 +1,1 @@
+import pygame import pygame . camera from PIL import Image pygame . camera . init ( ) cam = pygame . camera . Camera ( <str> , ( 800 , 600 ) ) cam . start ( ) img = cam . get_image ( ) pygame . image . save ( img , <str> ) cam . stop ( ) image = Image . open ( <str> ) image . show ( )  

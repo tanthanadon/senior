@@ -1,0 +1,1 @@
+definitions = { <str> : { <str> : <str> , <str> : <str> , <str> : <str> } , <str> : { <str> : <str> <str> , <str> : <str> <str> } , <str> : { <str> : <str> <str> , <str> : <str> <str> } }  

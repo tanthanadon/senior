@@ -1,0 +1,1 @@
+from openerp import models , fields , api class HarmonizedSystem ( models . Model ) :      _name = <str> _description = <str> name = fields . Char ( <str> , required = True ) description = fields . Char ( <str> , required = True )  class product_template ( models . Model ) :      _inherit = <str> hs_codes = fields . Many2one ( <str> , <str> , help = <str> )   

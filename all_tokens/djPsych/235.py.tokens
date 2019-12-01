@@ -1,0 +1,1 @@
+from django import template from djexperiments . models import Experiment register = template . Library ( ) @ register . inclusion_tag ( <str> , takes_context = True ) def show_experiments ( context ) :      experiments = Experiment . objects . filter ( research_group__in = context [ <str> ] . user . groups . all ( ) ) return { <str> : experiments }   

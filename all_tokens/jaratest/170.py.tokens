@@ -1,0 +1,1 @@
+from jaratoolbox import behavioranalysis from pylab import * import sys datestring = str ( sys . argv [ 1 ] ) print datestring sessions = datestring + <str> subjects = [ <str> , <str> , <str> ] figure ( ) try :      behavioranalysis . behavior_summary ( subjects , sessions , trialslim = [ 0 , 1000 ] , outputDir = <str> )  except :      print <str> pass   

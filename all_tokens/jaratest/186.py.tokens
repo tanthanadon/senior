@@ -1,0 +1,1 @@
+from jaratoolbox import celldatabase reload ( celldatabase ) eSession = celldatabase . EphysSessionInfo cellDB = celldatabase . CellDatabase ( ) oneES = eSession ( animalName = <str> , ephysSession = <str> , clustersEachTetrode = { 1 : [ 3 ] } , behavSession = <str> ) cellDB . append_session ( oneES )  

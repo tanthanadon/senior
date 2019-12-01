@@ -1,0 +1,1 @@
+from jaratoolbox import spikesorting reload ( spikesorting ) CASE = 1 if CASE == 1 :      animalName = <str> ephysSession = <str> tetrode = 6  oneTT = spikesorting . TetrodeToCluster ( animalName , ephysSession , tetrode ) oneTT . save_report ( )  

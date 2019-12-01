@@ -1,0 +1,1 @@
+import allcells_test030 as allcells from jaratoolbox import loadopenephys from jaratoolbox import ephyscore reload ( ephyscore ) cellInd = 2 oneCell = allcells . cellDB [ cellInd ] print oneCell print oneCell . get_filename ( ) spkData = ephyscore . CellData ( oneCell )  

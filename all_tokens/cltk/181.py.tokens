@@ -1,0 +1,1 @@
+__author__ = [ <str> , <str> ] __license__ = <str> OldNorseTokenizerPatterns = [ ( <str> , <str> ) , ( <str> , <str> ) ]  

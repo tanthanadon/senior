@@ -1,0 +1,1 @@
+from setuptools import setup , find_packages setup ( name = <str> , version = <str> , description = <str> , author = <str> , author_email = <str> , packages = [ <str> ] , entry_points = { <str> : [ <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> ] , } , )   

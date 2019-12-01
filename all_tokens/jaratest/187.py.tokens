@@ -1,0 +1,1 @@
+from pylab import * from jaratoolbox import waveformcutter reload ( waveformcutter ) animalName = <str> ephysSession = <str> tetrode = 5 wc = waveformcutter . WaveformCutterSession ( animalName , ephysSession , tetrode ) cluster = 7 wc . set_active_cluster ( cluster ) wc . set_channel ( 0 ) clf ( ) wc . plot_cluster_waveforms ( cluster , 200 ) show ( )  

@@ -1,0 +1,1 @@
+import os oldList = os . listdir ( <str> ) newList = [ ] for ind , f in enumerate ( oldList ) :      fileParts = f . split ( <str> ) freq = fileParts [ 5 ] . split ( <str> ) [ 0 ] os . system ( <str> % ( freq , fileParts [ 2 ] , freq , fileParts [ 3 ] ) )   

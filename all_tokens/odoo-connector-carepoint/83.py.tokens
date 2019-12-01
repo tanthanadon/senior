@@ -1,0 +1,1 @@
+from odoo . addons . connector . unit . synchronizer import Deleter class CarepointDeleter ( Deleter ) :      def run ( self , carepoint_id ) :          raise NotImplementedError ( <str> )    

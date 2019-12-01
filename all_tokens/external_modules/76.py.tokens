@@ -1,0 +1,1 @@
+from openerp import models , fields class ResourceCalendar ( models . Model ) :      _inherit = <str> reminder_delay = fields . Integer ( help = <str> )   

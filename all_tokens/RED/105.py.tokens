@@ -1,0 +1,1 @@
+class vars_in_class ( object ) :      def get_variables ( self , * args ) :          return { <str> : <str> , <str> : <str> , <str> : <str> }    

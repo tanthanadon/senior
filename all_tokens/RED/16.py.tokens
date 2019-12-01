@@ -1,0 +1,1 @@
+import sys from io import StringIO from subprocess import Popen , PIPE print ( <str> ) print ( <str> ) print ( <str> ) sys . stdout . flush ( ) execution = Popen ( sys . argv [ 1 : ] ) execution . communicate ( )   

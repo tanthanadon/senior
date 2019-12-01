@@ -1,0 +1,1 @@
+from skimage import io import numpy as np from matplotlib import pyplot as plt from jaratoolbox import extraplots datafile = <str> imdata = io . imread ( datafile ) nFrames , width , height = imdata . shape plt . clf ( ) plt . imshow ( imdata [ 600 , : , : ] ) plt . axis ( <str> ) plt . show ( )   

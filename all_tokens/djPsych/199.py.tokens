@@ -1,0 +1,1 @@
+from __future__ import unicode_literals from django . db import migrations , models class Migration ( migrations . Migration ) :      dependencies = [ ( <str> , <str> ) , ] operations = [ migrations . AlterField ( model_name = <str> , name = <str> , field = models . IntegerField ( default = - 1 , help_text = <str> ) , ) , ]   

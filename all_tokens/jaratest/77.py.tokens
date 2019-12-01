@@ -1,0 +1,1 @@
+import imp class EphysInterface ( object ) :      def __init__ ( self , filepath ) :          self . filepath = filepath self . inforec = self . load_inforec ( )  def load_inforec ( self ) :          inforec = imp . load_source ( <str> , self . filepath ) return inforec   ep = EphysInterface ( <str> )  

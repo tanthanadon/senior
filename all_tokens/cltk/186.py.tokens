@@ -1,0 +1,1 @@
+__author__ = [ <str> , <str> ] __license__ = <str> from cltk . tokenize . word import BaseArabyWordTokenizer def WordTokenizer ( ) :      return ArabicArabyWordTokenizer ( )  class ArabicArabyWordTokenizer ( BaseArabyWordTokenizer ) :      def __init__ ( self : object , language : str = <str> ) :          super ( ) . __init__ ( language = language )    

@@ -1,0 +1,1 @@
+def add ( ) : 	 return 5  def multiply ( ) : 	 return 8  def subtract ( ) : 	 pass    

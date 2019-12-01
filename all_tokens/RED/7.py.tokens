@@ -1,0 +1,1 @@
+class Dump ( object ) : 	 def dump ( self , obj ) : 		 return <str> + str ( obj )     

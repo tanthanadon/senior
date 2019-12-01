@@ -1,0 +1,1 @@
+import os from himlarcli import utils def main ( ) :      logger = utils . setup_logger ( <str> , debug = True ) logger . debug ( <str> )  if __name__ == <str> :      main ( )   

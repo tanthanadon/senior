@@ -1,0 +1,1 @@
+def sort_trials ( data ) :      bulks = { } for trial in data :          type = trial [ <str> ] if type in bulks :              bulks [ type ] . append ( trial )  else :              bulks [ type ] = [ trial ]   return bulks    

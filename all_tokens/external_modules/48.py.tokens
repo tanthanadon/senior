@@ -1,0 +1,1 @@
+__name__ = ( <str> ) def copy_risk_insurance_status_values ( cr ) :      cr . execute ( ) cr . execute ( )  def migrate ( cr , version ) :      if not version :          return  copy_risk_insurance_status_values ( cr )   

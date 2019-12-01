@@ -1,0 +1,1 @@
+def init ( job ) :      service = job . service if service . model . data . type . upper ( ) not in [ <str> , <str> ] :          raise j . exceptions . Input ( <str> )    

@@ -1,0 +1,1 @@
+from openerp import models , fields class AcountBankingMandates ( models . Model ) :      _inherit = <str> active = fields . Boolean ( <str> , related = <str> , readonly = True )   

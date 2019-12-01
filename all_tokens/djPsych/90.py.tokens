@@ -1,0 +1,1 @@
+class SettingException ( Exception ) :      pass  class NoAppropriateModel ( Exception ) :      pass  class PayoutException ( Exception ) :      pass  class BackendConfigException ( Exception ) :      pass  class ParticipationRefused ( Exception ) :      pass  class InvalidData ( Exception ) :      pass    

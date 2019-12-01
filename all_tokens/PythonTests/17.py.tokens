@@ -1,0 +1,1 @@
+def dupl ( a ) :      b = [ ] item = 0 while item < len ( a ) :          if a . count ( a [ item ] ) > 1 : 			 print item , <str> , a [ item ] , a . index ( a [ item ] ) del a [ item ]  item += 1  print <str> , a  a = [ 1 , 2 , 3 , 3 , 4 , 5 , 6 , 2 ] print <str> , len ( a ) , print <str> , a dupl ( a )  

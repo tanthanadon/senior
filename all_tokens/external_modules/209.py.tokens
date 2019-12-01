@@ -1,0 +1,1 @@
+from openerp import models , fields , api , exceptions , _ class ResCountry ( models . Model ) :      _inherit = <str> website_available = fields . Boolean ( )  class ResCountryState ( models . Model ) :      _inherit = <str> website_available = fields . Boolean ( default = True )   

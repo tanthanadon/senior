@@ -1,0 +1,1 @@
+import urllib , xbmc title = xbmc . getInfoLabel ( <str> ) if xbmc . getInfoLabel ( <str> ) == <str> : 	 title = xbmc . getInfoLabel ( <str> )  xbmc . executebuiltin ( <str> % urllib . quote ( title ) )  

@@ -1,0 +1,1 @@
+from openerp import models , api class ProductProduct ( models . Model ) :      _inherit = <str> @ api . multi def write ( self , vals ) :          if vals . get ( <str> , False ) :              self . mapped ( <str> ) . write ( { <str> : vals [ <str> ] } )  return super ( ProductProduct , self ) . write ( vals )    

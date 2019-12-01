@@ -1,0 +1,1 @@
+import sys from tcconfig . tcdel import main if __name__ == <str> :      sys . exit ( main ( ) )   

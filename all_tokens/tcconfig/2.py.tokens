@@ -1,0 +1,1 @@
+import sys from tcconfig . tcshow import main if __name__ == <str> :      sys . exit ( main ( ) )   

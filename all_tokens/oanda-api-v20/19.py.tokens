@@ -1,0 +1,1 @@
+def exampleAuth ( ) :      accountID , token = None , None with open ( <str> ) as I :          accountID = I . read ( ) . strip ( )  with open ( <str> ) as I :          token = I . read ( ) . strip ( )  return accountID , token   
