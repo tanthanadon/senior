@@ -1,4 +1,3 @@
-from CodeTokenizer.tokenizer import TokeNizer
 import sys, token, tokenize
 from pathlib import Path
 import re
@@ -6,46 +5,7 @@ import pandas as pd
 # For bash command
 import os
 
-def tokenizer1():
-    TN = TokeNizer("Python")
 
-    f = open("example.py", "r")
-    content = f.read()
-    #print(content)
-
-    tokens = TN.getPureTokens(content)
-    print(tokens)
-
-def testExperiment():
-    PATH_PYTHON = "/home/thanadon/Documents/Project/Sample Projects/requests/requests"
-    
-    p = Path(PATH_PYTHON)
-    files = list(p.rglob("*.py"))
-    
-    d = {}
-    #print(type(d))
-    # vocabulary
-    tokens = []
-    
-    for file in files:
-        if (file != "/home/thanadon/Documents/Project/Sample Projects/requests/requests/api.py"):
-            tokens.append(tokenization(file))
-    #print(tokens)
-    n = 2
-    ngrams = list(everygrams(tokens, max_len=n))
-    # Model
-    lm = MLE(n)
-    #print(len(lm.vocab))
-    #print(vocab)
-    train, vocab = padded_everygram_pipeline(n, tokens)
-    lm.fit(train, vocab)
-    #print(len(lm.vocab.lookup("if")))
-    #test = testTokenization("/home/thanadon/Documents/Project/Sample Projects/requests/requests/api.py")
-    #print(test)
-    #print(lm.entropy("for"))
-    #print(lm.perplexity("for"))
-    #print(lm.generate(5, random_seed=3))   
-    
 def testWritingToken():
     PATH_PYTHON = "/home/thanadon/Documents/Project/Sample Projects/requests/requests"
     PATH_TOKEN = "/home/thanadon/Documents/Project/LanguageModel/tokens/"
@@ -113,22 +73,25 @@ def createTokenFile(pythonPath, tokenPath, tokenID):
     
 
 def prepareToken(PATH_PYTHON, PATH_TOKEN, projectName):
-    p = Path(PATH_PYTHON)
-    q = Path(PATH_TOKEN+projectName+"/")
+    p = PATH_PYTHON
+    q = Path(str(PATH_TOKEN)+projectName+"/")
+    print(p)
+    print(q)
+    
     q.mkdir(parents=True, exist_ok=True)
     files = list(p.rglob("*.py"))
     d = {}
     #print(type(d))
     tokenID = 0
     pairDirList = []
-    
+    print(PATH_PYTHON)
     for file in files:
         pairDirList = createTokenFile(file, q, tokenID)
         tokenID = tokenID + 1
-        #print(tempList[1])
         d[pairDirList[0]] = pairDirList[1]
     
     return d
+    
     
 
 def clearBefore(PATH_TOKEN, PATH_FILES):
@@ -176,37 +139,57 @@ def main():
     language = "python"
     
     # Statis Paths
-    PATH_SAMPLE = "/home/thanadon/Documents/Project/Sample_Projects/"
-    PATH_TOKEN = "/home/thanadon/Documents/Project/LanguageModel/all_tokens/"
-    PATH_MITLM = "/home/thanadon/Documents/Project/LanguageModel/CacheModelPackage/"
-    PATH_FILES = PATH_MITLM+"evaluation/data/"+language+"/"
-    PATH_OUTPUT = PATH_MITLM+"evaluation/results/entropy/"+language+"/"
-    PATH_CSV = "/home/thanadon/Documents/Project/LanguageModel/all_csv/"
+    PATH_SAMPLE = Path("../Sample_Projects/").resolve()
+    PATH_TOKEN = Path("../all_tokens/").resolve()
+    PATH_MITLM = Path("~/CacheModelPackage/").expanduser()
+    PATH_FILES = Path(str(PATH_MITLM)+"/evaluation/data/"+language+"/")
+    PATH_OUTPUT = Path(str(PATH_MITLM)+"/evaluation/results/entropy/"+language+"/")
+    PATH_CSV = Path("../all_csv/").resolve()
 
     # Create the main directory for cloning projects
-    Path(PATH_SAMPLE).mkdir(parents=True, exist_ok=True)
+    PATH_SAMPLE.mkdir(parents=True, exist_ok=True)
     # Create the main directory for storing token files of all projects
-    Path(PATH_TOKEN).mkdir(parents=True, exist_ok=True)
+    PATH_TOKEN.mkdir(parents=True, exist_ok=True)
+    # Create the main directory for storing token files in CacheModelPackage porject
+    PATH_FILES.mkdir(parents=True, exist_ok=True)
+    # Create the main directory for storing the output from MITLM tool
+    PATH_OUTPUT.mkdir(parents=True, exist_ok=True)
     # Create the main directory for storing csv files of all projects
-    Path(PATH_CSV).mkdir(parents=True, exist_ok=True)
+    PATH_CSV.mkdir(parents=True, exist_ok=True)
 
     #PATH_PYTHON = "/home/thanadon/Documents/Project/Sample_Projects/requests"
     #print(PATH_PYTHON)
+    '''
+    print(PATH_SAMPLE.exists())
+    print(PATH_TOKEN.exists())
+    print(PATH_MITLM.exists())
+    print(PATH_FILES.exists())
+    print(PATH_OUTPUT.exists())
+    print(PATH_CSV.exists())
+
+    print(PATH_SAMPLE)
+    print(PATH_TOKEN)
+    print(PATH_MITLM)
+    print(PATH_FILES)
+    print(PATH_OUTPUT)
+    print(PATH_CSV)
+    '''
 
     d = {}
-    p = Path(PATH_SAMPLE+".")
+
     # Loop for all directories
     # check each item is a directory or not
-    for PATH_PYTHON in p.iterdir():
+    for PATH_PYTHON in PATH_SAMPLE.iterdir():
+        #print(PATH_PYTHON)
         if PATH_PYTHON.is_dir():
             try:
                 # Get the name of project from the directory
                 projectName = str(Path(PATH_PYTHON).parts[-1])
-                print(projectName)
+                #print(projectName)
                 
                 # Prepare tokens of each project
                 d = prepareToken(PATH_PYTHON, PATH_TOKEN, projectName)
-                
+                '''
                 # mapping directories of Python files with the directories of token files
                 df = pd.DataFrame([(k, v) for k, v in d.items()], columns=['pythonPath', 'tokenPath'])
                 #print(df)
@@ -220,11 +203,13 @@ def main():
 
                 # Clear all csv files of the previous iteration
                 clearAfter(PATH_OUTPUT, PATH_CSV, projectName)
+                '''
             except:
                 continue
+                
         else:
             continue
     
 
-#main()
+main()
 
