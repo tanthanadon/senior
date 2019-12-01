@@ -1,6 +1,0 @@
-[submodule "CacheModelPackage"]
-	path = CacheModelPackage
-	url = https://github.com/caseycas/CacheModelPackage.git
-[submodule "mitlm"]
-	path = mitlm
-	url = https://github.com/mitlm/mitlm.git
