@@ -1,40 +1,62 @@
 from pathlib import Path
 import pandas as pd
-import json
-import simplejson
 import os
-
-import requests
-from requests.auth import HTTPBasicAuth
+import logging
 
 
-def getURL(apiURL):
-    r = requests.get(apiURL)
-    json = r.json()
-    return (json['html_url'])
 
-def cloneProject(df):
-    for index, rows in df.iterrows():
-        os.system("git clone "+getURL(rows['url']))
-        #print(df.loc[index].fullURL = getURL(df.loc[index].url))
+def getRepo(PATH_CSV):
+    # Read API urls from csv file
+    old_csv = ''
+    sample = PATH_CSV.glob('sample.csv')
+    for s in sample:
+        if s.is_file():
+            old_csv = str(s)
+        else:
+            print("This csv file does not exist")
+    print(old_csv)
     
-def main():
-    PATH_SAMPLE = "/home/thanadon/Documents/Project/Sample_Projects/"
-    PATH_CSV = '/home/thanadon/Documents/Project/csv/Visualization_GoodSample.csv' 
+    df = pd.read_csv(old_csv)
+    repo = []
+    for index, row in df.iterrows():
+        repo.append(row['url'].split('https://api.github.com/repos/')[-1])
+    #print(temp)
+    df['repo'] = pd.DataFrame(repo)
+    # Get Purepath and convert to string
+    # Save dataframe to csv file
+    #print(str(PATH_CSV)+'/sample_repo.csv')
+    new_csv = str(PATH_CSV.resolve())+'/sample_repo.csv'
+    #print(new_csv)
+    df.to_csv(new_csv)
+    print("\n########### Getting repo finished ##############\n")
+    return df
+    
 
+def cloneProject(PATH_SAMPLE, df):
     # Create the main directory for cloning projects
     Path(PATH_SAMPLE).mkdir(parents=True, exist_ok=True)
     os.chdir(PATH_SAMPLE)
     os.system("pwd")
+    for index, row in df.iterrows():
+        # Clone each project to local repository
+        os.system("git clone https://github.com/"+row['repo'])
+        logging.basicConfig(filename='gitclone.log', format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        logging.info(row['repo'])
+        #print(row['repo'])
+    print("\n########### Cloning repo finished ##############\n")
+    
+def main():
+    PATH_SAMPLE = Path('../Sample_Projects/').resolve()
+    PATH_CSV = Path('../csv/').resolve()
+    #print(PATH_SAMPLE)
+    print(PATH_CSV)
 
-    # Read API urls from csv file
-    df = pd.read_csv(PATH_CSV)
-    #print(df['url'])
-
-    # Get URL of projects
-    #getURL(df)
-
+    # Get repo for each project and save as csv file
+    df = getRepo(PATH_CSV)
+    
+    # Read csv file that contains repository
     # Clone projects to local repositories
-    cloneProject(df)
+    cloneProject(str(PATH_SAMPLE), df)
+    
 
 main()

@@ -6,17 +6,6 @@ import pandas as pd
 # For bash command
 import os
 
-from nltk.util import pad_sequence
-from nltk.util import bigrams
-from nltk.util import ngrams
-from nltk.util import everygrams
-from nltk.lm.preprocessing import pad_both_ends
-from nltk.lm.preprocessing import flatten
-from nltk.lm.preprocessing import padded_everygram_pipeline
-from nltk.lm import MLE
-from nltk.lm import NgramCounter
-from nltk.lm import Vocabulary
-
 def tokenizer1():
     TN = TokeNizer("Python")
 
