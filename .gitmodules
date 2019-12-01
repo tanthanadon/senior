@@ -1,0 +1,3 @@
+[submodule "CacheModelPackage"]
+	path = CacheModelPackage
+	url = https://github.com/caseycas/CacheModelPackage.git
