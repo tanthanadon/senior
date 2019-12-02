@@ -2,8 +2,7 @@ from pathlib import Path
 import pandas as pd
 import os
 import logging
-
-
+import time
 
 def getRepo(PATH_CSV):
     # Read API urls from csv file
@@ -29,22 +28,24 @@ def getRepo(PATH_CSV):
     #print(new_csv)
     df.to_csv(new_csv)
     print("\n########### Getting repo finished ##############\n")
-    return df
     
 
 def cloneProject(PATH_SAMPLE, df):
     # Create the main directory for cloning projects
-    Path(PATH_SAMPLE).mkdir(parents=True, exist_ok=True)
-    os.chdir(PATH_SAMPLE)
+    PATH_SAMPLE.mkdir(parents=True, exist_ok=True)
+    os.chdir(str(PATH_SAMPLE))
     os.system("pwd")
     for index, row in df.iterrows():
         # Clone each project to local repository
         os.system("git clone https://github.com/"+row['repo'])
+        project = Path(str(PATH_SAMPLE)+"/"+row['repo'].split("/")[-1])
+        #print(project.exists())
+        project.rename(row['project_id'])
         logging.basicConfig(filename='gitclone.log', format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
         logging.info(row['repo'])
         #print(row['repo'])
     print("\n########### Cloning repo finished ##############\n")
-    
+
 def main():
     PATH_SAMPLE = Path('../Sample_Projects/').resolve()
     PATH_CSV = Path('../csv/').resolve()
@@ -52,11 +53,13 @@ def main():
     print(PATH_CSV)
 
     # Get repo for each project and save as csv file
-    df = getRepo(PATH_CSV)
+    getRepo(PATH_CSV)
     
     # Read csv file that contains repository
     # Clone projects to local repositories
-    cloneProject(str(PATH_SAMPLE), df)
-    
+    df = pd.read_csv('../csv/sample_repo.csv')
+    cloneProject(PATH_SAMPLE, df)
 
+start_time = time.time()
 main()
+print("--- %s seconds ---" % (time.time() - start_time))

@@ -1,6 +1,5 @@
 import sys, token, tokenize
 from pathlib import Path
-import re
 import pandas as pd
 # For bash command
 import os
@@ -59,12 +58,10 @@ def createTokenFile(pythonPath, tokenPath, tokenID):
     #print(tokenLine)
     fileName = str(tokenID) + ".py.tokens"
     PATH_OUTPUT = str(tokenPath) + "/" + str(fileName)
-    print(PATH_OUTPUT)
     
     output = Path(PATH_OUTPUT)
     #print(output.exists())
     # If the file does not exist, it will prepare new files
-    
     with output.open(mode='w+') as file:
             #print(fid)
             file.write(tokenLine)
@@ -74,31 +71,27 @@ def createTokenFile(pythonPath, tokenPath, tokenID):
     return list
     
 
-def prepareToken(PATH_PYTHON, PATH_TOKEN, projectName):
-    p = PATH_PYTHON
-    q = Path(str(PATH_TOKEN)+"/"+projectName+"/")
-    print(p)
-    print(q)
-    
-    q.mkdir(parents=True, exist_ok=True)
-    files = list(p.rglob("*.py"))
+def prepareToken(PATH_PYTHON, PATH_TOKEN, projectID):
+    target = Path(str(PATH_TOKEN)+"/"+projectID+"/")
+    target.mkdir(parents=True, exist_ok=True)
+    #print(PATH_PYTHON.resolve())
+    files = list(PATH_PYTHON.rglob("*.py"))
+    for path in sorted(PATH_PYTHON.rglob('*.py')):
+        print(path)
+
     d = {}
-    #print(type(d))
     tokenID = 0
     pairDirList = []
-    print(PATH_PYTHON)
     for file in files:
-        # Ignore project 'etl-scripts'
-        if(projectName == 'etl-scripts'):
-            continue;
-        pairDirList = createTokenFile(file, q, tokenID)
+        print(file)
+        '''
+        pairDirList = createTokenFile(file, target, tokenID)
         tokenID = tokenID + 1
         d[pairDirList[0]] = pairDirList[1]
-    
+    PYTHON.rglob("*.py"))
     return d
+    '''
     
-    
-
 def clearBefore(PATH_TOKEN, PATH_FILES):
     #print(PATH_TOKEN)
     print(PATH_FILES)
@@ -107,7 +100,7 @@ def clearBefore(PATH_TOKEN, PATH_FILES):
 
     # Remove all token files for previous project
     os.system("rm -vrdf "+str(PATH_FILES)+"/files/*.tokens")
-    
+
     # Create new directory first
     q = Path(PATH_FILES+"/files")
     q.mkdir(parents=True, exist_ok=True)
@@ -130,16 +123,25 @@ def calculateEntropy(PATH_MITLM):
         os.system("./scripts/cross.py ./data/python/ "+str(i)+" -ENTROPY -BACKOFF -DEBUG -FILES > ./results/entropy/python/"+str(i)+"gramsNoCache.txt")
         os.system("python ./scripts/convertCacheResults.py ./results/entropy/python/ ./results/entropy/python/summary/ngrams.csv")   
 
-def clearAfter(PATH_OUTPUT, PATH_CSV, projectName):
+def clearAfter(PATH_OUTPUT, PATH_CSV, projectID):
+    
     # Create new directory for storing csv file for each project
     os.system("mkdir -p "+PATH_CSV)
     # Copy summary of results to the original project
     os.system("rsync -rv "+PATH_OUTPUT+"/summary/ "+PATH_CSV)
     # Rename ngram.csv file to project ID
-    Path(PATH_CSV+"/ngrams.csv").replace(PATH_CSV+"/"+projectName+".csv")
+    
+    Path(PATH_CSV+"/ngrams.csv").replace(PATH_CSV+"/"+projectID+".csv")
+    
     # Remove all summary files for previous project
     os.system("rm -rv "+PATH_OUTPUT+"*")
+    
     print("\n############## Clear After finished #########################")
+
+def mergeCSV(PATH_CSV):
+    temp = {}
+    for file in PATH_CSV.glob("*.csv"):
+        print(file.name.split(".csv")[0])
 
 def main():
     #testTokenization()
@@ -185,7 +187,8 @@ def main():
     '''
 
     d = {}
-
+    df = pd.read_csv("../csv/sample_repo.csv")
+    
     # Loop for all directories
     # check each item is a directory or not
     for PATH_PYTHON in PATH_SAMPLE.iterdir():
@@ -194,12 +197,13 @@ def main():
             try:
                 
                 # Get the name of project from the directory
-                projectName = str(Path(PATH_PYTHON).parts[-1])
-                #print(projectName)
+                projectID = PATH_PYTHON.name
+                #print(projectID)
                 
                 # Prepare tokens of each project
-                d = prepareToken(PATH_PYTHON, PATH_TOKEN, projectName)
-                
+                #print(PATH_PYTHON)
+                d = prepareToken(PATH_PYTHON, PATH_TOKEN, projectID)
+                '''
                 # mapping directories of Python files with the directories of token files
                 df = pd.DataFrame([(k, v) for k, v in d.items()], columns=['pythonPath', 'tokenPath'])
                 #print(df)
@@ -207,24 +211,21 @@ def main():
                 df.to_csv("mappingPython2Token.csv")
                 
                 # Clear all token files of the previous iteration
-                #rint(PATH_FILES)
-                #clearBefore(str(PATH_TOKEN)+"/"+projectName+"/", str(PATH_FILES))
+                clearBefore(str(PATH_TOKEN)+"/"+projectID+"/", str(PATH_FILES))
                 
                 calculateEntropy(str(PATH_MITLM))
-
+                
                 # Clear all csv files of the previous iteration
-                clearAfter(str(PATH_OUTPUT), str(PATH_CSV), projectName)
-                
-                
+                clearAfter(str(PATH_OUTPUT), str(PATH_CSV), projectID)
+                '''
             except:
                 continue
                 
         else:
             continue
-        
-        
-        
     
+    #mergeCSV(PATH_CSV)
+
 start_time = time.time()
 main()
 print("--- %s seconds ---" % (time.time() - start_time))
