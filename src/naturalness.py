@@ -129,24 +129,24 @@ def clearAfter(PATH_OUTPUT, PATH_CSV, projectID):
 
 def mergeCSV(PATH_CSV):
     temp = {}
-    ID = []
     for file in PATH_CSV.glob("*.csv"):
+        # Get projectID from file name
         projectID = file.name.split(".csv")[0]
-        ID.append(projectID)
         df = pd.read_csv(file)
         array = []
-        #print("########### "+projectID+" ###############")
         for i in range(1,11):
             index = "python"+str(i)+"NoCache"
-            #print("python"+str(i)+"NoCache")
-            #print(df[index].mean())
+            # Get average cross-entropy for each order of n-grams
             array.append(df[index].mean())
-        #print(array)
+        # Keep array of 1-10 grams into the dictionary
         temp[projectID] = array
-    #print(temp['31069027'])
+
     FINAL_CSV = Path("../csv/").resolve()
     
+    # Transpose matrix to set order of n-grams as columns with project IDs as index
     df = pd.DataFrame.from_dict(temp).T
+    #print(df)
+    # Save the final result into ../csv/merged_naturalness.csv
     df.to_csv(str(FINAL_CSV)+"/merged_naturalness.csv")
     print("########### Merging CSV finished ############")
 
