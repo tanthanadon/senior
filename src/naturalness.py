@@ -5,6 +5,7 @@ import pandas as pd
 import os
 # Measure compution time
 import time
+import re
 
 
 def testWritingToken():
@@ -46,27 +47,21 @@ def tokenization(file):
                     temp = ttext
                 line = line + temp + ' '
                 #print(repr(temp))
-        
                 
     #print(line)
     return line
 
 
 def createTokenFile(pythonPath, tokenPath, tokenID):
-    #print(line)
-    tokenLine = tokenization(pythonPath)
-    #print(tokenLine)
+    tokenLine = tokenization(str(pythonPath))
     fileName = str(tokenID) + ".py.tokens"
     PATH_OUTPUT = str(tokenPath) + "/" + str(fileName)
-    
     output = Path(PATH_OUTPUT)
-    #print(output.exists())
     # If the file does not exist, it will prepare new files
     with output.open(mode='w+') as file:
-            #print(fid)
             file.write(tokenLine)
             file.close()
-    #print(pythonPath.resolve())
+    print(pythonPath.resolve())
     list = [str(pythonPath.resolve()), PATH_OUTPUT]
     return list
     
@@ -76,25 +71,19 @@ def prepareToken(PATH_PYTHON, PATH_TOKEN, projectID):
     target.mkdir(parents=True, exist_ok=True)
     #print(PATH_PYTHON.resolve())
     files = list(PATH_PYTHON.rglob("*.py"))
-    for path in sorted(PATH_PYTHON.rglob('*.py')):
-        print(path)
-
     d = {}
     tokenID = 0
     pairDirList = []
     for file in files:
-        print(file)
-        '''
         pairDirList = createTokenFile(file, target, tokenID)
         tokenID = tokenID + 1
         d[pairDirList[0]] = pairDirList[1]
-    PYTHON.rglob("*.py"))
+    print("############## Tokenization for "+PATH_PYTHON+" finished ################")
     return d
-    '''
     
 def clearBefore(PATH_TOKEN, PATH_FILES):
     #print(PATH_TOKEN)
-    print(PATH_FILES)
+    #print(PATH_FILES)
     # Remove all fold files for previous project
     os.system("rm -vrdf "+str(PATH_FILES)+"/fold*")
 
@@ -187,8 +176,6 @@ def main():
     '''
 
     d = {}
-    df = pd.read_csv("../csv/sample_repo.csv")
-    
     # Loop for all directories
     # check each item is a directory or not
     for PATH_PYTHON in PATH_SAMPLE.iterdir():
@@ -199,17 +186,17 @@ def main():
                 # Get the name of project from the directory
                 projectID = PATH_PYTHON.name
                 #print(projectID)
-                
+                '''
                 # Prepare tokens of each project
                 #print(PATH_PYTHON)
                 d = prepareToken(PATH_PYTHON, PATH_TOKEN, projectID)
-                '''
+                
                 # mapping directories of Python files with the directories of token files
                 df = pd.DataFrame([(k, v) for k, v in d.items()], columns=['pythonPath', 'tokenPath'])
                 #print(df)
                 # convert dataframe to .csv file
                 df.to_csv("mappingPython2Token.csv")
-                
+                '''
                 # Clear all token files of the previous iteration
                 clearBefore(str(PATH_TOKEN)+"/"+projectID+"/", str(PATH_FILES))
                 
@@ -217,7 +204,8 @@ def main():
                 
                 # Clear all csv files of the previous iteration
                 clearAfter(str(PATH_OUTPUT), str(PATH_CSV), projectID)
-                '''
+                
+                
             except:
                 continue
                 

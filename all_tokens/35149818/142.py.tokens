@@ -1,0 +1,1 @@
+class Solution :      def winSum ( self , nums , k ) :          if not nums or len ( nums ) < k or k < 0 :              return [ ]  result = [ sum ( nums [ : k ] ) ] for i in xrange ( len ( nums ) - k ) :              result . append ( result [ - 1 ] - nums [ i ] + nums [ i + k ] )  return result    

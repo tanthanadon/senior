@@ -1,1 +1,0 @@
-import os BEHAVIOR_PATH = <str> EPHYS_PATH = <str> DEFAULT_EXPERIMENTER = <str> KK_PATH = <str>  

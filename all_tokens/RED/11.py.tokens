@@ -1,1 +1,0 @@
-try :      import robot . running . namespace tab = ( sorted ( robot . running . namespace . STDLIB_NAMES ) ) tab . remove ( <str> ) print ( <str> . join ( tab ) )  except :      import robot . libraries tab = [ ] tab = sorted ( list ( robot . libraries . STDLIBS ) ) tab . remove ( <str> ) std_libs = <str> for i in tab :          std_libs += i + <str>  print ( std_libs )   

@@ -1,1 +1,0 @@
-from jaratoolbox import loadbehavior filev1 = <str> filev2 = <str> filev3 = <str> bdata = loadbehavior . BehaviorData ( filev3 )  

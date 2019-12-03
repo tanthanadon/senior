@@ -1,0 +1,1 @@
+class Solution :      def hashCode ( self , key , HASH_SIZE ) :          mn = 33 hash_code = 0 for i in xrange ( len ( key ) ) :              hash_code = ( hash_code * mn + ord ( key [ i ] ) ) % HASH_SIZE  return hash_code    

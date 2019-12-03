@@ -1,1 +1,0 @@
-from jaratoolbox import loadopenephys from jaratoolbox import ephyscore from jaratoolbox import celldatabase oneCell = celldatabase . CellInfo ( <str> , <str> , <str> , 1 , 3 ) spkData = ephyscore . CellData ( oneCell )  

@@ -1,0 +1,1 @@
+import heapq class Solution :      def kthLargestElement2 ( self , nums , k ) :          result = [ ] for n in nums :              heapq . heappush ( result , n ) if len ( result ) > k :                  heapq . heappop ( result )   return heapq . heappop ( result )    

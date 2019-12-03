@@ -1,1 +1,0 @@
-from jaratest . nick . database import cellDB reload ( cellDB ) from jaratest . lan . Ephys import sitefuncs_vlan as sitefuncs reload ( sitefuncs ) sessionTypes = { <str> : <str> , <str> : <str> , <str> : <str> , <str> : <str> , <str> : <str> , <str> : <str> , <str> : <str> , <str> : <str> } badSessionList = [ ]  

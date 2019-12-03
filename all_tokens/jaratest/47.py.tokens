@@ -1,1 +1,0 @@
-from jaratoolbox import loadscanbox reload ( loadscanbox ) from matplotlib import pyplot as plt filename = <str> data = loadscanbox . sbxread ( filename ) maxdata = data . max ( axis = 3 ) [ 0 , : , : ] plt . imshow ( maxdata ) plt . show ( )  

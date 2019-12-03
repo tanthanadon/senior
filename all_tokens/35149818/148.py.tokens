@@ -1,0 +1,1 @@
+class Solution ( object ) :      def convertToTitle ( self , n ) :          if n <= 0 :              return <str>  n -= 1 result = <str> while n >= 0 :              cur_letter = chr ( n % 26 + ord ( <str> ) ) result = cur_letter + result n = n / 26 - 1  return result    
