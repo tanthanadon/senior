@@ -145,11 +145,9 @@ def mergeCSV(PATH_CSV):
     
     # Transpose matrix to set order of n-grams as columns with project IDs as index
     df = pd.DataFrame.from_dict(temp).T
-    #print(df)
     # Save the final result into ../csv/merged_naturalness.csv
     df.to_csv(str(FINAL_CSV)+"/merged_naturalness.csv")
     print("########### Merging CSV finished ############")
-
 
 def main():
     #testTokenization()
@@ -224,7 +222,6 @@ def main():
                 
                 # Clear all csv files of the previous iteration
                 clearAfter(str(PATH_OUTPUT), str(PATH_CSV), projectID)
-                
                 
             except:
                 continue
