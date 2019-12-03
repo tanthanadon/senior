@@ -129,8 +129,27 @@ def clearAfter(PATH_OUTPUT, PATH_CSV, projectID):
 
 def mergeCSV(PATH_CSV):
     temp = {}
+    ID = []
     for file in PATH_CSV.glob("*.csv"):
-        print(file.name.split(".csv")[0])
+        projectID = file.name.split(".csv")[0]
+        ID.append(projectID)
+        df = pd.read_csv(file)
+        array = []
+        #print("########### "+projectID+" ###############")
+        for i in range(1,11):
+            index = "python"+str(i)+"NoCache"
+            #print("python"+str(i)+"NoCache")
+            #print(df[index].mean())
+            array.append(df[index].mean())
+        #print(array)
+        temp[projectID] = array
+    #print(temp['31069027'])
+    FINAL_CSV = Path("../csv/").resolve()
+    
+    df = pd.DataFrame.from_dict(temp).T
+    df.to_csv(str(FINAL_CSV)+"/merged_naturalness.csv")
+    print("########### Merging CSV finished ############")
+
 
 def main():
     #testTokenization()
@@ -178,6 +197,7 @@ def main():
     d = {}
     # Loop for all directories
     # check each item is a directory or not
+    '''
     for PATH_PYTHON in PATH_SAMPLE.iterdir():
         #print(PATH_PYTHON)
         if PATH_PYTHON.is_dir():
@@ -186,7 +206,7 @@ def main():
                 # Get the name of project from the directory
                 projectID = PATH_PYTHON.name
                 #print(projectID)
-                '''
+                
                 # Prepare tokens of each project
                 #print(PATH_PYTHON)
                 d = prepareToken(PATH_PYTHON, PATH_TOKEN, projectID)
@@ -196,7 +216,7 @@ def main():
                 #print(df)
                 # convert dataframe to .csv file
                 df.to_csv("mappingPython2Token.csv")
-                '''
+                
                 # Clear all token files of the previous iteration
                 clearBefore(str(PATH_TOKEN)+"/"+projectID+"/", str(PATH_FILES))
                 
@@ -211,8 +231,8 @@ def main():
                 
         else:
             continue
-    
-    #mergeCSV(PATH_CSV)
+    '''
+    mergeCSV(PATH_CSV)
 
 start_time = time.time()
 main()
