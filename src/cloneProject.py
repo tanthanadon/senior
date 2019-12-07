@@ -41,8 +41,6 @@ def cloneProject(PATH_SAMPLE, df):
         project = Path(str(PATH_SAMPLE)+"/"+row['repo'].split("/")[-1])
         #print(project.exists())
         project.rename(row['project_id'])
-        logging.basicConfig(filename='gitclone.log', format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-        logging.info(row['repo'])
         #print(row['repo'])
     print("\n########### Cloning repo finished ##############\n")
 

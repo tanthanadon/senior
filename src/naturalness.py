@@ -7,6 +7,9 @@ import os
 import time
 import re
 
+# Progress bar
+from tqdm import trange, tqdm
+
 
 def testWritingToken():
     PATH_PYTHON = "/home/thanadon/Documents/Project/Sample Projects/requests/requests"
@@ -161,7 +164,7 @@ def main():
     PATH_MITLM = Path("~/CacheModelPackage/").expanduser()
     PATH_FILES = Path(str(PATH_MITLM)+"/evaluation/data/"+language+"/").resolve()
     PATH_OUTPUT = Path(str(PATH_MITLM)+"/evaluation/results/entropy/"+language+"/").resolve()
-    PATH_CSV = Path("../all_csv/").resolve()
+    PATH_CSV = Path("../all_naturalness/").resolve()
 
     # Create the main directory for cloning projects
     PATH_SAMPLE.mkdir(parents=True, exist_ok=True)
