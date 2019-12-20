@@ -63,7 +63,6 @@ def convertHTML(PATH_HTML, PATH_METRIC):
 
         #print(PATH_SUB_METRIC)
         files = list(PATH_SUB_HTML.rglob('*.html'))
-        
         for file in tqdm(files, desc="2nd Loop"):
             df = pd.read_html(str(file))
             csv = str(file.name).split(".html")[0]+".csv"
@@ -74,16 +73,19 @@ def convertHTML(PATH_HTML, PATH_METRIC):
             df[0].to_csv(str(PATH_SUB_METRIC)+"/"+csv)
     print("########### Convert HTML Finished ############")
 
-def calculateMI(PATH_SUB_METRIC):
+def calculateMI(PATH_METRIC):
+    print("MI")
 
-def calculateCC(PATH_SUB_METRIC):
+def calculateCC(PATH__METRIC):
     # TCC = Sum(CC) - Count(CC) + 1
+    print("CC")
     
 
-def calculateHV(PATH_SUB_METRIC):
+def calculateHV(PATH_METRIC):
+    print("HV")
 
-
-def mergeCSV(PATH_METRIC):
+def mergeCSV(PATH_METRIC, PATH_CSV):
+    temp = pd.DataFrame([])
     for PATH_SUB_METRIC in PATH_METRIC.iterdir():
         #print(PATH_SUB_HTML)
         #print(PATH_SUB_HTML.name)
@@ -93,26 +95,41 @@ def mergeCSV(PATH_METRIC):
         #print(PATH_SUB_METRIC)
         files = list(PATH_SUB_METRIC.rglob('*.csv'))
         
+        #print(projectID)
         """
-        To calculate
+        To merge .csv files in each project
         """
-
-        for file in tqdm(files, desc="2nd Loop"):
-            df = pd.read_csv(str(file))
-            csv = str(file.name).split(".html")[0]+".csv"
+        for file in tqdm(files):
+            #print(file)
+            df = pd.read_csv(str(file)).head(1)
+            df['project_id'] = projectID
+            df['file'] = str(file)
+            df = df.set_index('project_id')
+            #print(df)
+            temp = temp.append(df)
+            #df['project_id'] = projectID
+            #csv = str(file.name).split(".html")[0]+".csv"
             #print(str(PATH_SUB_METRIC)+"/"+csv)
-            print(df['Cyclomatic Complexity'])
-            print(df['Maintainability Index'])
-            
-            # Export to .csv file
-            #df[0].to_csv(str(PATH_SUB_METRIC)+"/"+csv)
-    print("########### Convert HTML Finished ############")
+            #print(df['Cyclomatic Complexity'])
+            #print(df['Maintainability Index'])
+            #print(df.head(1))
+        #print(temp)
+        #print(str(PATH_CSV)+"/"+projectID+".csv")
+        
+    final = pd.DataFrame(temp)
+    print(final)
+    final.to_csv(str(PATH_CSV)+"/merged_wily.csv")
+    print("########### Merge CSV Finished ############")
 
 def main():
     # Statis Paths
     PATH_SAMPLE = Path("../Sample_Projects/").resolve()
     # Create the main directory for cloning projects
     PATH_SAMPLE.mkdir(parents=True, exist_ok=True)
+
+    PATH_CSV = Path("../senior/csv").resolve()
+    # Create the main directory for storing csv projects
+    PATH_CSV.mkdir(parents=True, exist_ok=True)
 
     # Create the directory to store .html files for each project
     PATH_HTML = Path("../all_html/").resolve()
@@ -135,7 +152,7 @@ def main():
     #convertHTML(PATH_HTML, PATH_METRIC) // Okay
 
     # Measure all .csv file for MI, CC, HV in a project
-    mergeCSV(PATH_METRIC)
+    mergeCSV(PATH_METRIC, PATH_CSV)
     
 
 start_time = time.time()
