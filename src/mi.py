@@ -73,15 +73,20 @@ def convertHTML(PATH_HTML, PATH_METRIC):
             df[0].to_csv(str(PATH_SUB_METRIC)+"/"+csv)
     print("########### Convert HTML Finished ############")
 
-def calculateMI(PATH_METRIC):
-    print("MI")
+def sumMetrics(arr):
+    count = 0
+    for i in arr:
+        if("N" not in i):
+            count += int(i.split(" ")[0])
+        else:
+            continue
+    return count
 
-def calculateCC(PATH__METRIC):
+def calculateCC(df):
     # TCC = Sum(CC) - Count(CC) + 1
     print("CC")
-    
 
-def calculateHV(PATH_METRIC):
+def calculateHV(df):
     print("HV")
 
 def mergeCSV(PATH_METRIC, PATH_CSV):
@@ -105,8 +110,11 @@ def mergeCSV(PATH_METRIC, PATH_CSV):
             df['project_id'] = projectID
             df['file'] = str(file)
             df = df.set_index('project_id')
-            #print(df)
-            temp = temp.append(df)
+            #print(df.columns)
+            #print(df['Lines of Code'])
+            LOC = sumMetrics(df['Lines of Code'])
+            print(LOC)
+            #temp = temp.append(df)
             #df['project_id'] = projectID
             #csv = str(file.name).split(".html")[0]+".csv"
             #print(str(PATH_SUB_METRIC)+"/"+csv)
@@ -116,9 +124,9 @@ def mergeCSV(PATH_METRIC, PATH_CSV):
         #print(temp)
         #print(str(PATH_CSV)+"/"+projectID+".csv")
         
-    final = pd.DataFrame(temp)
-    print(final)
-    final.to_csv(str(PATH_CSV)+"/merged_wily.csv")
+    #final = pd.DataFrame(temp)
+    #print(final)
+    #final.to_csv(str(PATH_CSV)+"/merged_wily.csv")
     print("########### Merge CSV Finished ############")
 
 def main():
@@ -152,7 +160,7 @@ def main():
     #convertHTML(PATH_HTML, PATH_METRIC) // Okay
 
     # Measure all .csv file for MI, CC, HV in a project
-    mergeCSV(PATH_METRIC, PATH_CSV)
+    #mergeCSV(PATH_METRIC, PATH_CSV)
     
 
 start_time = time.time()
