@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from tqdm import trange, tqdm
 import time
+import numpy as np
 
 def buildWily(PATH_SAMPLE):
     for PATH_PYTHON in PATH_SAMPLE.iterdir():
@@ -113,35 +114,51 @@ def cleanCSV(PATH_CSV):
     #print(df[df.columns[~df.columns.isin(['project_id', 'Revision', 'Author', 'Date', 'Maintainability Ranking', 'file'])]])
     
     # Remove Plus sign(+) from table
-    df = df.replace(regex={r'[+-]': ""})
+    #df = df.replace(regex={r'[+-]': ""})
 
     # Remove (0) and (0.0) from table
-    df = df.replace(regex={r'\s\(\b\d*\b\)': ""})
-    df = df.replace(regex={r'\s\(\b\d*\.\d*\b\)': ""})
+    df = df.replace(regex={r'\s\(.*': ""})
     
     # Remove "Not found ..." in table
-    df = df.replace(regex={r"^Not found \'[a-zA-Z\w]*\'": str(float("NaN"))})
-    
+    #df = df.replace(regex={r"\/.*\.[\w:]+": ""})
+    df = df.replace(regex={r"^Not found \'.*": str(np.nan)})
     #print(df[df[:].isna()==False].count())
     print(df)
-    df.to_csv(str(PATH_CSV)+"/merged_wily_final.csv", index=False)
+    df.to_csv(str(PATH_CSV)+"/merged_wily_na.csv", index=False)
     print("########### Clean CSV Finished ############")
 
-def sumMetrics(arr):
-    count = 0
-    for i in arr:
-        if("N" not in i):
-            count += int(i.split(" ")[0])
-        else:
-            continue
-    return count
+def cleanNA(PATH_CSV):
+    print(PATH_CSV)
+    df = pd.read_csv(str(PATH_CSV)+"/merged_wily_na.csv")
+    df.dropna(inplace=True)
+    print(df.isna())
+    df.to_csv(str(PATH_CSV)+"/merged_wily_nona.csv", index=False)
+    print("########### Clean NA Finished ############")
 
-def calculateCC(df):
-    # TCC = Sum(CC) - Count(CC) + 1
-    print("CC")
+def sumMetrics(PATH_CSV):
+    print(PATH_CSV)
+    df = pd.read_csv(str(PATH_CSV)+"/merged_wily_nona.csv", index_col=0)
+    print(df.columns)
+    new = df[df.columns[~df.columns.isin(['Date','Maintainability Ranking','Maintainability Index','file'])]].groupby('project_id').sum()
+    #print(new.columns)
+    #print(new)
+    # Find Program Length (N)
+    #print(new['Length of application'])
 
-def calculateHV(df):
-    print("HV")
+    #print(50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2))
+    #print(new['Multi-line comments']) 
+    
+    #print(5.2*np.log2(new['Code volume']).head(1))
+    #print(0.23*new['Cyclomatic Complexity'].head(1))
+    #print(16.2*np.log2(new['S Lines of Code']).head(1))
+    #print(50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2))
+    
+    #print(100*(171-5.2*np.log2(new['Code volume'])-0.23*new['Cyclomatic Complexity']-16.2*np.log2(new['S Lines of Code'])+50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2))/171)
+
+    new['Maintainability Index'] = df['Maintainability Index'].groupby('project_id').mean()
+    print(new)
+    new.to_csv(str(PATH_CSV)+"/merged_wily_final.csv")
+    print("########### Sum Metrics Finished ############")
 
 def main():
     # Statis Paths
@@ -176,9 +193,14 @@ def main():
     # Measure all .csv file for MI, CC, HV in a project
     #mergeCSV(PATH_METRIC, PATH_CSV)
     
-    # clean data in merged_wily.csv
-    cleanCSV(PATH_CSV)
+    # Clean data from merged_wily.csv
+    #cleanCSV(PATH_CSV)
     
+    # Clean NaN values from merged_wily_na.csv
+    #cleanNA(PATH_CSV)
+
+    # Sum all metrics in merged_wily_nona.csv
+    sumMetrics(PATH_CSV)
 
 start_time = time.time()
 main()
