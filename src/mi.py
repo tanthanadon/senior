@@ -73,22 +73,6 @@ def convertHTML(PATH_HTML, PATH_METRIC):
             df[0].to_csv(str(PATH_SUB_METRIC)+"/"+csv)
     print("########### Convert HTML Finished ############")
 
-def sumMetrics(arr):
-    count = 0
-    for i in arr:
-        if("N" not in i):
-            count += int(i.split(" ")[0])
-        else:
-            continue
-    return count
-
-def calculateCC(df):
-    # TCC = Sum(CC) - Count(CC) + 1
-    print("CC")
-
-def calculateHV(df):
-    print("HV")
-
 def mergeCSV(PATH_METRIC, PATH_CSV):
     temp = pd.DataFrame([])
     for PATH_SUB_METRIC in PATH_METRIC.iterdir():
@@ -110,24 +94,54 @@ def mergeCSV(PATH_METRIC, PATH_CSV):
             df['project_id'] = projectID
             df['file'] = str(file)
             df = df.set_index('project_id')
-            #print(df.columns)
-            #print(df['Lines of Code'])
-            LOC = sumMetrics(df['Lines of Code'])
-            print(LOC)
-            #temp = temp.append(df)
-            #df['project_id'] = projectID
-            #csv = str(file.name).split(".html")[0]+".csv"
-            #print(str(PATH_SUB_METRIC)+"/"+csv)
-            #print(df['Cyclomatic Complexity'])
-            #print(df['Maintainability Index'])
-            #print(df.head(1))
+            #print(df)
+            temp = temp.append(df)
         #print(temp)
-        #print(str(PATH_CSV)+"/"+projectID+".csv")
         
-    #final = pd.DataFrame(temp)
-    #print(final)
-    #final.to_csv(str(PATH_CSV)+"/merged_wily.csv")
+    final = pd.DataFrame(temp)
+    print(final)
+    final.to_csv(str(PATH_CSV)+"/merged_wily.csv", index=False)
     print("########### Merge CSV Finished ############")
+
+def cleanCSV(PATH_CSV):
+    print(PATH_CSV)
+    df = pd.read_csv(str(PATH_CSV)+"/merged_wily.csv")
+    #print(df)
+    df.drop(['Unnamed: 0'], axis=1, inplace=True)
+    #print(df)
+    #print(df.columns)
+    #print(df[df.columns[~df.columns.isin(['project_id', 'Revision', 'Author', 'Date', 'Maintainability Ranking', 'file'])]])
+    
+    # Remove Plus sign(+) from table
+    df = df.replace(regex={r'[+-]': ""})
+
+    # Remove (0) and (0.0) from table
+    df = df.replace(regex={r'\s\(\b\d*\b\)': ""})
+    df = df.replace(regex={r'\s\(\b\d*\.\d*\b\)': ""})
+    
+    # Remove "Not found ..." in table
+    df = df.replace(regex={r"^Not found \'[a-zA-Z\w]*\'": str(float("NaN"))})
+    
+    #print(df[df[:].isna()==False].count())
+    print(df)
+    df.to_csv(str(PATH_CSV)+"/merged_wily_final.csv", index=False)
+    print("########### Clean CSV Finished ############")
+
+def sumMetrics(arr):
+    count = 0
+    for i in arr:
+        if("N" not in i):
+            count += int(i.split(" ")[0])
+        else:
+            continue
+    return count
+
+def calculateCC(df):
+    # TCC = Sum(CC) - Count(CC) + 1
+    print("CC")
+
+def calculateHV(df):
+    print("HV")
 
 def main():
     # Statis Paths
@@ -135,7 +149,7 @@ def main():
     # Create the main directory for cloning projects
     PATH_SAMPLE.mkdir(parents=True, exist_ok=True)
 
-    PATH_CSV = Path("../senior/csv").resolve()
+    PATH_CSV = Path("../csv").resolve()
     # Create the main directory for storing csv projects
     PATH_CSV.mkdir(parents=True, exist_ok=True)
 
@@ -161,6 +175,9 @@ def main():
 
     # Measure all .csv file for MI, CC, HV in a project
     #mergeCSV(PATH_METRIC, PATH_CSV)
+    
+    # clean data in merged_wily.csv
+    cleanCSV(PATH_CSV)
     
 
 start_time = time.time()
