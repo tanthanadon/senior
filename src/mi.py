@@ -136,9 +136,9 @@ def cleanNA(PATH_CSV):
     print("########### Clean NA Finished ############")
 
 def sumMetrics(PATH_CSV):
-    print(PATH_CSV)
+    #print(PATH_CSV)
     df = pd.read_csv(str(PATH_CSV)+"/merged_wily_nona.csv", index_col=0)
-    print(df.columns)
+    #print(df.columns)
     new = df[df.columns[~df.columns.isin(['Date','Maintainability Ranking','Maintainability Index','file'])]].groupby('project_id').sum()
     #print(new.columns)
     #print(new)
@@ -147,18 +147,23 @@ def sumMetrics(PATH_CSV):
 
     #print(50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2))
     #print(new['Multi-line comments']) 
+    print("###### 5.2*log2(Halstead Volume) #######")
+    print(5.2*np.log2(new['Code volume']).head(1))
+    print("\n###### 0.23*(Cyclomatic Complexity) #######")
+    print(0.23*new['Cyclomatic Complexity'].head(1))
+    print("\n###### 16.2*log2(the number of Source Lines of Code) #######")
+    print(16.2*np.log2(new['S Lines of Code']).head(1))
+    print("\n###### 50*sin(sqrt(2.4 * the ratio between number of comment lines and SLOC)) #######")
+    print(50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2)[0])
     
-    #print(5.2*np.log2(new['Code volume']).head(1))
-    #print(0.23*new['Cyclomatic Complexity'].head(1))
-    #print(16.2*np.log2(new['S Lines of Code']).head(1))
-    #print(50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2))
-    
+    print("\n###### Maintainability Index #######")
+    print(171-5.2*np.log2(new['Code volume'].head(1))-0.23*new['Cyclomatic Complexity'].head(1)-16.2*np.log2(new['S Lines of Code'].head(1))+50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2)[0])
     #print(100*(171-5.2*np.log2(new['Code volume'])-0.23*new['Cyclomatic Complexity']-16.2*np.log2(new['S Lines of Code'])+50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2))/171)
 
-    new['Maintainability Index'] = df['Maintainability Index'].groupby('project_id').mean()
-    print(new)
-    new.to_csv(str(PATH_CSV)+"/merged_wily_final.csv")
-    print("########### Sum Metrics Finished ############")
+    #new['Maintainability Index'] = df['Maintainability Index'].groupby('project_id').mean()
+    #print(new)
+    #new.to_csv(str(PATH_CSV)+"/merged_wily_final.csv")
+    #print("########### Sum Metrics Finished ############")
 
 def main():
     # Statis Paths
