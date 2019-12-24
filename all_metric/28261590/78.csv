@@ -1,2 +1,2 @@
 ,Revision,Author,Date,Lines of Code,L Lines of Code,S Lines of Code,Multi-line comments,Multi lines,blank lines,Single comment lines,Cyclomatic Complexity,Unique Operands,Unique Operators,Number of Operands,Number of Operators,Unique vocabulary (h1 + h2),Length of application,Code volume,Difficulty,Effort,Maintainability Ranking,Maintainability Index
-0,cc82c66,Joachim Wolff,2019-12-03,62 (0),30 (0),48 (0),5 (0),4 (0),7 (0),3 (0),1 (0),1 (0),4 (0),3 (0),6 (0),5 (0),9 (0),20.8974 (0),0.75 (0),15.673 (0),A,81.2543 (0)
+0,cc82c66,Joachim Wolff,2019-12-03,68 (0),44 (0),53 (0),10 (0),0 (0),9 (0),6 (0),1 (0),3 (0),8 (0),5 (0),10 (0),11 (0),15 (0),51.8915 (0),1.875 (0),97.2965 (0),A,74.9114 (0)

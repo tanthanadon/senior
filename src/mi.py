@@ -94,6 +94,7 @@ def mergeCSV(PATH_METRIC, PATH_CSV):
             df = pd.read_csv(str(file)).head(1)
             df['project_id'] = projectID
             df['file'] = str(file)
+            df.drop(['Unnamed: 0'], axis=1, inplace=True)
             df = df.set_index('project_id')
             #print(df)
             temp = temp.append(df)
@@ -101,14 +102,13 @@ def mergeCSV(PATH_METRIC, PATH_CSV):
         
     final = pd.DataFrame(temp)
     print(final)
-    final.to_csv(str(PATH_CSV)+"/merged_wily.csv", index=False)
+    final.to_csv(str(PATH_CSV)+"/merged_wily.csv")
     print("########### Merge CSV Finished ############")
 
 def cleanCSV(PATH_CSV):
     print(PATH_CSV)
     df = pd.read_csv(str(PATH_CSV)+"/merged_wily.csv")
     #print(df)
-    df.drop(['Unnamed: 0'], axis=1, inplace=True)
     #print(df)
     #print(df.columns)
     #print(df[df.columns[~df.columns.isin(['project_id', 'Revision', 'Author', 'Date', 'Maintainability Ranking', 'file'])]])
@@ -124,27 +124,27 @@ def cleanCSV(PATH_CSV):
     df = df.replace(regex={r"^Not found \'.*": str(np.nan)})
     #print(df[df[:].isna()==False].count())
     print(df)
-    df.to_csv(str(PATH_CSV)+"/merged_wily_na.csv", index=False)
+    df.to_csv(str(PATH_CSV)+"/merged_wily_na.csv")
     print("########### Clean CSV Finished ############")
 
 def cleanNA(PATH_CSV):
-    print(PATH_CSV)
-    df = pd.read_csv(str(PATH_CSV)+"/merged_wily_na.csv")
+    #print(PATH_CSV)
+    df = pd.read_csv(str(PATH_CSV)+"/merged_wily_na.csv", index_col=0)
     df.dropna(inplace=True)
     print(df.isna())
-    df.to_csv(str(PATH_CSV)+"/merged_wily_nona.csv", index=False)
+    df.to_csv(str(PATH_CSV)+"/merged_wily_nona.csv")
     print("########### Clean NA Finished ############")
 
 def sumMetrics(PATH_CSV):
     #print(PATH_CSV)
     df = pd.read_csv(str(PATH_CSV)+"/merged_wily_nona.csv", index_col=0)
-    #print(df.columns)
+    print(df)
     new = df[df.columns[~df.columns.isin(['Date','Maintainability Ranking','Maintainability Index','file'])]].groupby('project_id').sum()
     #print(new.columns)
     #print(new)
     # Find Program Length (N)
     #print(new['Length of application'])
-
+    '''
     #print(50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2))
     #print(new['Multi-line comments']) 
     print("###### 5.2*log2(Halstead Volume) #######")
@@ -162,8 +162,9 @@ def sumMetrics(PATH_CSV):
 
     #new['Maintainability Index'] = df['Maintainability Index'].groupby('project_id').mean()
     #print(new)
+    '''
     #new.to_csv(str(PATH_CSV)+"/merged_wily_final.csv")
-    #print("########### Sum Metrics Finished ############")
+    print("########### Sum Metrics Finished ############")
 
 def main():
     # Statis Paths
@@ -183,26 +184,26 @@ def main():
     PATH_METRIC = Path("../all_metric/").resolve()
     PATH_METRIC.mkdir(parents=True, exist_ok=True)
 
-    #print(PATH_SAMPLE)
+    print(PATH_SAMPLE)
 
     # Build Wily package into a project
-    #buildWily(PATH_SAMPLE) //Okay
+    buildWily(PATH_SAMPLE)
     
     # Create HTML file from .py files in a project
-    #prepareHTML(PATH_SAMPLE, PATH_HTML) //Okay
+    prepareHTML(PATH_SAMPLE, PATH_HTML)
     #os.system("pwd")
     
     # Convert all html for each project to .csv file and save them to all_metric folder
-    #convertHTML(PATH_HTML, PATH_METRIC) // Okay
+    convertHTML(PATH_HTML, PATH_METRIC)
 
     # Measure all .csv file for MI, CC, HV in a project
-    #mergeCSV(PATH_METRIC, PATH_CSV)
+    mergeCSV(PATH_METRIC, PATH_CSV)
     
     # Clean data from merged_wily.csv
-    #cleanCSV(PATH_CSV)
+    cleanCSV(PATH_CSV)
     
     # Clean NaN values from merged_wily_na.csv
-    #cleanNA(PATH_CSV)
+    cleanNA(PATH_CSV)
 
     # Sum all metrics in merged_wily_nona.csv
     sumMetrics(PATH_CSV)

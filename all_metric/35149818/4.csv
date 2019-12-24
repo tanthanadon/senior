@@ -1,2 +1,2 @@
 ,Revision,Author,Date,Lines of Code,L Lines of Code,S Lines of Code,Multi-line comments,Multi lines,blank lines,Single comment lines,Cyclomatic Complexity,Unique Operands,Unique Operators,Number of Operands,Number of Operators,Unique vocabulary (h1 + h2),Length of application,Code volume,Difficulty,Effort,Maintainability Ranking,Maintainability Index
-0,c072c40,Gavin Li,2017-09-19,60 (0),29 (0),26 (0),7 (0),18 (0),9 (0),7 (0),19 (0),11 (0),19 (0),19 (0),37 (0),30 (0),56 (0),274.786 (0),10.7105 (0),2943.1 (0),A,75.8632 (0)
+0,c072c40,Gavin Li,2017-09-19,51 (0),24 (0),22 (0),4 (0),17 (0),8 (0),4 (0),17 (0),6 (0),10 (0),10 (0),18 (0),16 (0),28 (0),112 (0),5.4 (0),604.8 (0),A,80.6153 (0)

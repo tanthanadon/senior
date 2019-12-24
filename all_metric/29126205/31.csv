@@ -1,2 +1,2 @@
 ,Revision,Author,Date,Lines of Code,L Lines of Code,S Lines of Code,Multi-line comments,Multi lines,blank lines,Single comment lines,Cyclomatic Complexity,Unique Operands,Unique Operators,Number of Operands,Number of Operators,Unique vocabulary (h1 + h2),Length of application,Code volume,Difficulty,Effort,Maintainability Ranking,Maintainability Index
-0,e16eddc,seclark,2019-11-12,80 (0),54 (0),54 (0),12 (0),0 (0),16 (0),10 (0),0 (0),5 (0),17 (0),14 (0),25 (0),22 (0),39 (0),173.918 (0),3.67647 (0),639.404 (0),A,70.4848 (0)
+0,e16eddc,seclark,2019-11-12,73 (0),54 (0),54 (0),1 (0),0 (0),18 (0),1 (0),0 (0),4 (0),39 (0),30 (0),57 (0),43 (0),87 (0),472.085 (0),2.92308 (0),1379.94 (0),A,50.9496 (0)
