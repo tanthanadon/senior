@@ -85,7 +85,8 @@ def mergeCSV(PATH_METRIC, PATH_CSV):
         #print(PATH_SUB_METRIC)
         files = list(PATH_SUB_METRIC.rglob('*.csv'))
         
-        #print(projectID)
+        x = [11161411, 28420571, 52512066]
+        
         """
         To merge .csv files in each project
         """
@@ -163,7 +164,7 @@ def sumMetrics(PATH_CSV):
     #new['Maintainability Index'] = df['Maintainability Index'].groupby('project_id').mean()
     #print(new)
     '''
-    #new.to_csv(str(PATH_CSV)+"/merged_wily_final.csv")
+    new.to_csv(str(PATH_CSV)+"/merged_wily_final.csv")
     print("########### Sum Metrics Finished ############")
 
 def main():
