@@ -71,7 +71,7 @@ def convertHTML(PATH_HTML, PATH_METRIC):
             #print(df[0])
             # Get the metrics of lastest version of a project
             # Export to .csv file
-            df[0].to_csv(str(PATH_SUB_METRIC)+"/"+csv)
+            df[0].to_csv(str(PATH_SUB_METRIC)+"/"+csv, index=False)
     print("########### Convert HTML Finished ############")
 
 def mergeCSV(PATH_METRIC, PATH_CSV):
@@ -85,8 +85,6 @@ def mergeCSV(PATH_METRIC, PATH_CSV):
         #print(PATH_SUB_METRIC)
         files = list(PATH_SUB_METRIC.rglob('*.csv'))
         
-        x = [11161411, 28420571, 52512066]
-        
         """
         To merge .csv files in each project
         """
@@ -95,7 +93,6 @@ def mergeCSV(PATH_METRIC, PATH_CSV):
             df = pd.read_csv(str(file)).head(1)
             df['project_id'] = projectID
             df['file'] = str(file)
-            df.drop(['Unnamed: 0'], axis=1, inplace=True)
             df = df.set_index('project_id')
             #print(df)
             temp = temp.append(df)
@@ -103,7 +100,7 @@ def mergeCSV(PATH_METRIC, PATH_CSV):
         
     final = pd.DataFrame(temp)
     print(final)
-    final.to_csv(str(PATH_CSV)+"/merged_wily.csv")
+    final.to_csv(str(PATH_CSV)+"/merged_wily.csv", index=False)
     print("########### Merge CSV Finished ############")
 
 def cleanCSV(PATH_CSV):
