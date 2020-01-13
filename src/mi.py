@@ -130,38 +130,37 @@ def cleanNA(PATH_CSV):
     df = pd.read_csv(str(PATH_CSV)+"/merged_wily_na.csv", index_col=0)
     df.dropna(inplace=True)
     print(df.isna())
-    df.to_csv(str(PATH_CSV)+"/merged_wily_nona.csv")
+    df.to_csv(str(PATH_CSV)+"/merged_wily_nona.csv", index=False)
     print("########### Clean NA Finished ############")
 
 def sumMetrics(PATH_CSV):
     #print(PATH_CSV)
-    df = pd.read_csv(str(PATH_CSV)+"/merged_wily_nona.csv", index_col=0)
-    print(df)
-    new = df[df.columns[~df.columns.isin(['Date','Maintainability Ranking','Maintainability Index','file'])]].groupby('project_id').sum()
-    #print(new.columns)
-    #print(new)
+    df = pd.read_csv(str(PATH_CSV)+"/merged_wily_nona.csv")
+    new = df[df.columns[~df.columns.isin(['Date','Maintainability Ranking', 'Maintainability Index','file'])]].groupby('project_id').sum()
+    new.reset_index(inplace=True)
     # Find Program Length (N)
     #print(new['Length of application'])
-    '''
-    #print(50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2))
-    #print(new['Multi-line comments']) 
-    print("###### 5.2*log2(Halstead Volume) #######")
-    print(5.2*np.log2(new['Code volume']).head(1))
-    print("\n###### 0.23*(Cyclomatic Complexity) #######")
-    print(0.23*new['Cyclomatic Complexity'].head(1))
-    print("\n###### 16.2*log2(the number of Source Lines of Code) #######")
-    print(16.2*np.log2(new['S Lines of Code']).head(1))
-    print("\n###### 50*sin(sqrt(2.4 * the ratio between number of comment lines and SLOC)) #######")
-    print(50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2)[0])
+    # print(50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2))
+    # print(new['Multi-line comments'])
+    # print("###### 5.2*log2(Halstead Volume) #######")
+    # print(5.2*np.log2(new['Code volume']).head(1))
+    # print("\n###### 0.23*(Cyclomatic Complexity) #######")
+    # print(0.23*new['Cyclomatic Complexity'].head(1))
+    # print("\n###### 16.2*log2(the number of Source Lines of Code) #######")
+    # print(16.2*np.log2(new['S Lines of Code']).head(1))
+    # print("\n###### 50*sin(sqrt(2.4 * the ratio between number of comment lines and SLOC)) #######")
+    # print(50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2)[0])
     
-    print("\n###### Maintainability Index #######")
-    print(171-5.2*np.log2(new['Code volume'].head(1))-0.23*new['Cyclomatic Complexity'].head(1)-16.2*np.log2(new['S Lines of Code'].head(1))+50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2)[0])
-    #print(100*(171-5.2*np.log2(new['Code volume'])-0.23*new['Cyclomatic Complexity']-16.2*np.log2(new['S Lines of Code'])+50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2))/171)
-
-    #new['Maintainability Index'] = df['Maintainability Index'].groupby('project_id').mean()
-    #print(new)
-    '''
-    new.to_csv(str(PATH_CSV)+"/merged_wily_final.csv")
+    # print("\n###### Maintainability Index #######")
+    # print(171-5.2*np.log2(new['Code volume'].head(1))-0.23*new['Cyclomatic Complexity'].head(1)-16.2*np.log2(new['S Lines of Code'].head(1))+50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2)[0])
+    # #print(100*(171-5.2*np.log2(new['Code volume'])-0.23*new['Cyclomatic Complexity']-16.2*np.log2(new['S Lines of Code'])+50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2))/171)
+    mi = df[['project_id','Maintainability Index']].groupby('project_id').mean()
+    new.set_index('project_id', inplace=True)
+    new['Maintainability Index'] = mi
+    new.reset_index(inplace=True)
+    print(new)
+    
+    new.to_csv(str(PATH_CSV)+"/merged_wily_final.csv", index=False)
     print("########### Sum Metrics Finished ############")
 
 def main():
@@ -182,26 +181,26 @@ def main():
     PATH_METRIC = Path("../all_metric/").resolve()
     PATH_METRIC.mkdir(parents=True, exist_ok=True)
 
-    print(PATH_SAMPLE)
+    # print(PATH_SAMPLE)
 
-    # Build Wily package into a project
-    buildWily(PATH_SAMPLE)
+    # # Build Wily package into a project
+    # buildWily(PATH_SAMPLE)
     
-    # Create HTML file from .py files in a project
-    prepareHTML(PATH_SAMPLE, PATH_HTML)
-    #os.system("pwd")
+    # # Create HTML file from .py files in a project
+    # prepareHTML(PATH_SAMPLE, PATH_HTML)
+    # #os.system("pwd")
     
-    # Convert all html for each project to .csv file and save them to all_metric folder
-    convertHTML(PATH_HTML, PATH_METRIC)
+    # # Convert all html for each project to .csv file and save them to all_metric folder
+    # convertHTML(PATH_HTML, PATH_METRIC)
 
-    # Measure all .csv file for MI, CC, HV in a project
-    mergeCSV(PATH_METRIC, PATH_CSV)
+    # # Measure all .csv file for MI, CC, HV in a project
+    # mergeCSV(PATH_METRIC, PATH_CSV)
     
-    # Clean data from merged_wily.csv
-    cleanCSV(PATH_CSV)
+    # # Clean data from merged_wily.csv
+    #cleanCSV(PATH_CSV)
     
-    # Clean NaN values from merged_wily_na.csv
-    cleanNA(PATH_CSV)
+    # # Clean NaN values from merged_wily_na.csv
+    #cleanNA(PATH_CSV)
 
     # Sum all metrics in merged_wily_nona.csv
     sumMetrics(PATH_CSV)
