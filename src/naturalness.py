@@ -166,8 +166,8 @@ def mergeCSV(PATH_CSV):
     
     df = pd.melt(df, id_vars=["project_id"], var_name = ["order"], value_vars=df.columns[1:], value_name="cross-entropy")
     print(df)
-    # Save the final result into ../csv/merged_naturalness.csv
-    df.to_csv(str(FINAL_CSV)+"/merged_naturalness.csv")
+    # Save the final result into ../csv/merged_naturalness_final.csv
+    df.to_csv(str(FINAL_CSV)+"/merged_naturalness_final.csv")
     
     
     print("########### Merging CSV finished ############")

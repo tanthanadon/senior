@@ -64,12 +64,19 @@ def mergeChurn(PATH_CHURN_CSV, PATH_CSV):
     #print(df)
     # Export merged csv files as merged_churn.csv
     df.to_csv("{0}/merged_churn.csv".format(PATH_CSV), index=False)
-
+    
     # Group rows by project id
     df = df.groupby('project_id').sum()
+    df.reset_index(inplace=True)
     #print(df)
+
+    natural = pd.read_csv("{0}/merged_naturalness_final.csv".format(PATH_CSV), index_col=0)
+    df = df.merge(natural)
+    print(df)
+
     # Export final version of merged csv files in project level
     df.to_csv("{0}/merged_churn_final.csv".format(PATH_CSV), index=False)
+    
 
 def main():
     # Statis Paths
