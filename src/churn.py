@@ -70,14 +70,11 @@ def mergeChurn(PATH_CHURN_CSV, PATH_CSV):
     df.reset_index(inplace=True)
     #print(df)
 
-    natural = pd.read_csv("{0}/merged_naturalness_final.csv".format(PATH_CSV), index_col=0)
-    df = df.merge(natural)
-    print(df)
-
     # Export final version of merged csv files in project level
     df.to_csv("{0}/merged_churn_final.csv".format(PATH_CSV), index=False)
     
-
+    print("########### mergeChurn() Finished ############")
+    
 def main():
     # Statis Paths
     PATH_SAMPLE = Path("../Sample_Projects/").resolve()
