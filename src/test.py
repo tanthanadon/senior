@@ -51,7 +51,8 @@ def calculateMI(path_project):
     # print(merge)
     return {'project_id': path.name, 'mi': mi_visit(txt, True)}
 
-def main():
+start_time = time.time()
+if __name__ == "__main__":
     # Paths of sample projeects
     PATH_SAMPLE = Path("../Sample_Projects/").resolve()
 
@@ -64,8 +65,6 @@ def main():
     df = pd.DataFrame(dict, columns=['project_id', 'mi']).sort_values('project_id', ascending=True)
     print(df)
 
-    df.to_csv("{0}/{1}".format(PATH_CSV, "mi_final.csv"), index=False)
+    # df.to_csv("{0}/{1}".format(PATH_CSV, "mi_final.csv"), index=False)
 
-start_time = time.time()
-main()
 print("--- %s seconds ---" % (time.time() - start_time))
