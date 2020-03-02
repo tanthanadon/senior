@@ -1,0 +1,1 @@
+__author__ = [ <str> ] __license__ = <str> import string from nltk . tokenize . punkt import PunktLanguageVars class SanskritLanguageVars ( PunktLanguageVars ) :      sent_end_chars = [ <str> , <str> , <str> , <str> ]   

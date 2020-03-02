@@ -1,0 +1,1 @@
+def process ( tr , parameters , tableBuilder ) :    ids = parameters . get ( <str> ) expID = parameters . get ( <str> ) exp = tr . getExperiment ( expID ) for sampID in ids :      sample = tr . getSampleForUpdate ( sampID ) sample . setExperiment ( exp )     

@@ -1,0 +1,1 @@
+import ehtim as eh import ruamel . yaml as yaml input = <str> config = <str> output = <str> with open ( config , <str> ) as f :      config = yaml . load ( f ) obs = eh . Pipeline ( config ) . apply ( input ) . data obs . save_uvfits ( output )   

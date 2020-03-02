@@ -1,0 +1,1 @@
+import xbmc xbmc . executebuiltin ( <str> )  

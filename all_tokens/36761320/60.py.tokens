@@ -1,0 +1,1 @@
+import sys def is_virtual_env ( ) :      if not hasattr ( sys , <str> ) :          print <str> sys . exit ( 1 )    

@@ -1,0 +1,1 @@
+from odoo import models , fields class FdbImgId ( models . Model ) :      _name = <str> df_id = fields . Integer ( help = <str> , ) ndc_id = fields . Many2one ( string = <str> , comodel_name = <str> , ) manufacturer_id = fields . Many2one ( string = <str> , comodel_name = <str> , ) image_ids = fields . One2many ( string = <str> , comodel_name = <str> , inverse_name = <str> , )   

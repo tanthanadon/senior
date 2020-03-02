@@ -1,0 +1,1 @@
+import heapq class Solution :      def KthInArrays ( self , arrays , k ) :          heap = [ ] for a in arrays :              for n in a :                  heapq . heappush ( heap , n ) if len ( heap ) > k :                      heapq . heappop ( heap )    return heapq . heappop ( heap )    

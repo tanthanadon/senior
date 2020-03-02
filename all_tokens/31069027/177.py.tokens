@@ -1,0 +1,1 @@
+from openerp . osv import fields , orm , osv class ResCompany ( osv . osv ) :      _inherit = <str> _columns = { <str> : fields . integer ( <str> ) }   

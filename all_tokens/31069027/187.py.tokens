@@ -1,0 +1,1 @@
+from openerp import models , fields class rappel_type ( models . Model ) :      _name = <str> _description = <str> name = fields . Char ( <str> , size = 255 , required = True ) code = fields . Char ( <str> , size = 56 ) product_id = fields . Many2one ( <str> , <str> , required = True , help = <str> <str> )   

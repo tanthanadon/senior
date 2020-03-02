@@ -1,0 +1,1 @@
+class UnknownLemma ( Exception ) :       class InputError ( Exception ) :        

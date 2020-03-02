@@ -1,0 +1,1 @@
+class Solution ( object ) :      def findComplement ( self , num ) :          mask = ~ 0 while mask & num :              mask <<= 1  return ~ mask & ~ num   class Solution ( object ) :      def findComplement ( self , num ) :          first_zero = 1 while first_zero <= num :              first_zero <<= 1  return ( first_zero - 1 ) ^ num    

@@ -1,0 +1,1 @@
+from . base import * DEBUG = True DATABASES = { <str> : { <str> : <str> , <str> : os . path . join ( BASE_DIR , <str> ) , } } EMAIL_HOST = <str> EMAIL_HOST_PASSWORD = <str> EMAIL_HOST_USER = <str> EMAIL_PORT = 587 DEFAULT_FROM_EMAIL = EMAIL_HOST MEDIA_ROOT = os . path . join ( BASE_DIR , <str> ) MEDIA_URL = <str> FIREBASE_SERVER_KEY = <str>  

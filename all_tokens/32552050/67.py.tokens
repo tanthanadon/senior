@@ -1,0 +1,1 @@
+import os from django . core . wsgi import get_wsgi_application os . environ . setdefault ( <str> , <str> ) application = get_wsgi_application ( )  

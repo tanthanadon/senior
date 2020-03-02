@@ -1,0 +1,1 @@
+from openerp import models , fields class res_partner ( models . Model ) :      _inherit = <str> early_payment_discount_ids = fields . One2many ( <str> , <str> , <str> )   

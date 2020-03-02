@@ -1,0 +1,1 @@
+from django . conf . urls import url , include from . views import home , allExperiments urlpatterns = [ url ( <str> , home , name = <str> ) , url ( <str> , include ( <str> , namespace = <str> ) ) , url ( <str> , allExperiments , name = <str> ) , url ( <str> , include ( <str> ) ) , ]  

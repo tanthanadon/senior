@@ -1,0 +1,1 @@
+class Solution ( object ) :      def isPerfectSquare ( self , num ) :          if not num or num < 0 :              return False  if num <= 1 :              return True  base = 1 while num > 0 :              num -= base base += 2  return num == 0    

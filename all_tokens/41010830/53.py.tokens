@@ -1,0 +1,1 @@
+from . baserequest import BaseRequest class TradeCloseRequest ( BaseRequest ) :      def __init__ ( self , units = <str> ) :          super ( TradeCloseRequest , self ) . __init__ ( ) if units :              self . _data . update ( { <str> : <str> . format ( int ( units ) ) if units != <str> else <str> } )     

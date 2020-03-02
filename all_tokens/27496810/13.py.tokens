@@ -1,0 +1,1 @@
+from setuptools import setup , find_packages from redpydevd import __version__ setup ( name = <str> , version = __version__ , author = <str> , author_email = <str> , description = <str> , long_description = open ( <str> ) . read ( ) , url = <str> , packages = find_packages ( ) , classifiers = [ <str> , <str> , <str> , <str> , ] , )   

@@ -1,0 +1,1 @@
+MULTILINGUAL_CORPORA = [ { <str> : <str> , <str> : [ <str> , <str> ] , <str> : <str> , <str> : <str> , <str> : <str> , <str> : <str> } , { <str> : <str> , <str> : [ <str> , <str> ] , <str> : <str> , <str> : <str> , <str> : <str> , <str> : <str> } , { <str> : <str> , <str> : [ <str> , <str> ] , <str> : <str> , <str> : <str> , <str> : <str> , <str> : <str> } , ]  

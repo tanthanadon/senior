@@ -1,0 +1,1 @@
+from odoo import models , fields class FdbForm ( models . Model ) :      _name = <str> _description = <str> _inherits = { <str> : <str> } form_id = fields . Many2one ( string = <str> , comodel_name = <str> , required = True , ondelete = <str> , ) gcdf = fields . Char ( ) update_yn = fields . Boolean ( )   

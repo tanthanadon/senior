@@ -1,0 +1,1 @@
+BROKER_URL = <str> CELERY_RESULT_BACKEND = <str> CELERY_ONCE = { <str> : <str> , <str> : { <str> : <str> , <str> : 60 * 60 } } DOCKER_URL = <str>  

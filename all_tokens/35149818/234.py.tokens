@@ -1,0 +1,1 @@
+class Solution ( object ) :      prev = ( None , 0 ) def closestValue ( self , root , target ) :          result = root . val while root :              if abs ( float ( root . val ) - target ) < abs ( float ( result ) - target ) :                  result = root . val  root = root . left if root . val > target else root . right  return result    

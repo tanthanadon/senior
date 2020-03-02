@@ -1,0 +1,1 @@
+import smtplib from email . mime . text import MIMEText def process ( tr , parameters , tableBuilder ) :    expId = parameters . get ( <str> ) exp = tr . getExperimentForUpdate ( expId ) properties = parameters . get ( <str> ) for prop in properties . keySet ( ) :   	 exp . setPropertyValue ( prop , properties . get ( prop ) )    
