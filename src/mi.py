@@ -133,42 +133,29 @@ def cleanNA(PATH_CSV):
     df.to_csv(str(PATH_CSV)+"/wily_nona.csv", index=False)
     print("########### Clean NA Finished ############")
 
-def sumMetrics(PATH_CSV):
+def calculateMI(PATH_CSV):
     #print(PATH_CSV)
     df = pd.read_csv(str(PATH_CSV)+"/wily_nona.csv")
-    new = df[df.columns[~df.columns.isin(['Date','Maintainability Ranking', 'Maintainability Index','file'])]].groupby('project_id').sum()
+    new = df[df.columns[~df.columns.isin(['Date','Maintainability Ranking', 'Maintainability Index','file'])]].groupby('project_id').mean()
     new.reset_index(inplace=True)
-    # Find Program Length (N)
-    #print(new['Length of application'])
-    # print(50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2))
-    # print(new['Multi-line comments'])
-    # print("###### 5.2*log2(Halstead Volume) #######")
-    # print(5.2*np.log2(new['Code volume']).head(1))
-    # print("\n###### 0.23*(Cyclomatic Complexity) #######")
-    # print(0.23*new['Cyclomatic Complexity'].head(1))
-    # print("\n###### 16.2*log2(the number of Source Lines of Code) #######")
-    # print(16.2*np.log2(new['S Lines of Code']).head(1))
-    # print("\n###### 50*sin(sqrt(2.4 * the ratio between number of comment lines and SLOC)) #######")
-    # print(50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2)[0])
-    
+
     # print("\n###### Maintainability Index #######")
     # print(171-5.2*np.log2(new['Code volume'].head(1))-0.23*new['Cyclomatic Complexity'].head(1)-16.2*np.log2(new['S Lines of Code'].head(1))+50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2)[0])
-    # #print(100*(171-5.2*np.log2(new['Code volume'])-0.23*new['Cyclomatic Complexity']-16.2*np.log2(new['S Lines of Code'])+50*np.sinc((2.4*(new['Single comment lines']/new['S Lines of Code']))**1/2))/171)
+    # np.clip(100 * (171-(5.2*np.log(new['Code volume']))-(0.23*new['Cyclomatic Complexity'])-(16.2*np.log(new['S Lines of Code'])))/171, 0, 100)
+    # print(np.clip(100 * (171-(5.2*np.log(new['Code volume']))-(0.23*new['Cyclomatic Complexity'])-(16.2*np.log(new['S Lines of Code'])))/171, 0, 100))
     
     # Find median of MI and merge with df
-    # mi = df[['project_id','Maintainability Index']].groupby('project_id').agg(['median'])
-    mi = df[['project_id','Maintainability Index']].groupby('project_id').agg(['mean'])
-    new.set_index('project_id', inplace=True)
-    new['Maintainability Index'] = mi
-    new.reset_index(inplace=True)
-    print(new)
+    new['Maintainability Index'] = np.clip(100 * (171-(5.2*np.log(new['Code volume']))-(0.23*new['Cyclomatic Complexity'])-(16.2*np.log(new['S Lines of Code'])))/171, 0, 100)
     
+    print(new)
     # new.to_csv(str(PATH_CSV)+"/mi_med_final.csv", index=False)
-    new.to_csv(str(PATH_CSV)+"/mi_final.csv", index=False)
+    # new.to_csv(str(PATH_CSV)+"/mi_final.csv", index=False)
+
 
     print("########### Sum Metrics Finished ############")
 
-def main():
+start_time = time.time()
+if __name__ == "__main__":
     # Statis Paths
     PATH_SAMPLE = Path("../Sample_Projects/").resolve()
     # Create the main directory for cloning projects
@@ -208,8 +195,6 @@ def main():
     #cleanNA(PATH_CSV)
 
     # Sum all metrics in wily_nona.csv
-    sumMetrics(PATH_CSV)
+    calculateMI(PATH_CSV)
 
-start_time = time.time()
-main()
 print("--- %s seconds ---" % (time.time() - start_time))
