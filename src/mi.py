@@ -149,7 +149,7 @@ def calculateMI(PATH_CSV):
     
     print(new)
     # new.to_csv(str(PATH_CSV)+"/mi_med_final.csv", index=False)
-    # new.to_csv(str(PATH_CSV)+"/mi_final.csv", index=False)
+    new.to_csv(str(PATH_CSV)+"/mi_final.csv", index=False)
 
 
     print("########### Sum Metrics Finished ############")
