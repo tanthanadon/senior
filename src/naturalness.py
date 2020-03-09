@@ -12,7 +12,9 @@ import re
 from tqdm import trange, tqdm
 
 # Multiprocessing
+import logging
 import multiprocessing as mp
+from multiprocessing_logging import install_mp_handler
 
 language = "python"
     
@@ -97,14 +99,18 @@ def createTokenFile(pythonPath, tokenPath, tokenID):
     
 
 def prepareToken(PATH_PYTHON, PATH_TOKEN, projectID):
+    # Create folder all_tokens/projectID/
     target = Path(str(PATH_TOKEN)+"/"+projectID+"/")
     target.mkdir(parents=True, exist_ok=True)
     #print(PATH_PYTHON.resolve())
+    
+    # Search all .py files
     files = list(PATH_PYTHON.rglob("*.py"))
     d = {}
     tokenID = 0
     pairDirList = []
     for file in files:
+        # Create token file for each .py file
         pairDirList = createTokenFile(file, target, tokenID)
         tokenID = tokenID + 1
         d[pairDirList[0]] = pairDirList[1]
@@ -114,6 +120,9 @@ def prepareToken(PATH_PYTHON, PATH_TOKEN, projectID):
 def clearBefore(PATH_TOKEN, PATH_FILES, PATH_OUTPUT):
     #print(PATH_TOKEN)
     #print(PATH_FILES)
+    
+    # PATH_FILES = PATH_MITLM/evaluation/data/python/
+
     # Remove all fold files for previous project
     os.system("rm -vrdf "+str(PATH_FILES)+"/fold*")
 
@@ -125,7 +134,7 @@ def clearBefore(PATH_TOKEN, PATH_FILES, PATH_OUTPUT):
     q.mkdir(parents=True, exist_ok=True)
 
     # Copy all tokens files for next project
-    os.system("rsync -rv "+str(PATH_TOKEN)+"*.tokens "+str(q))\
+    os.system("rsync -rv "+str(PATH_TOKEN)+"*.tokens "+str(q))
 
     # Remove sample result in MIT language model
     os.system("rm -rv "+PATH_OUTPUT+"*")
@@ -205,58 +214,57 @@ def mean(PATH_CSV):
     # print(df)
     df.to_csv("{0}/naturalness_final.csv".format(PATH_CSV), index=False)
 
-def experiment(PATH_SAMPLE):
+def experiment(PATH_PYTHON):
     # Loop for all directories
     # check each item is a directory or not
     # dict_token = {}
-    for PATH_PYTHON in PATH_SAMPLE:
-        #print(PATH_PYTHON)
-        if PATH_PYTHON.is_dir():
-            try:
-                
-                # Get the name of project from the directory
-                projectID = PATH_PYTHON.name
-                #print(projectID)
-                
-                # Prepare tokens of each project
-                # print(PATH_PYTHON)
-                prepareToken(PATH_PYTHON, PATH_TOKEN, projectID)
-    
-                # # mapping directories of Python files with the directories of token files
-                # df = pd.DataFrame([(k, v) for k, v in d.items()], columns=['pythonPath', 'tokenPath'])
-                # #print(df)
-                # dict_token.append(d)
+    #print(PATH_PYTHON)
+    if PATH_PYTHON.is_dir():
+        try:
+            
+            # Get the name of project from the directory
+            projectID = PATH_PYTHON.name
+            #print(projectID)
+            
+            # Prepare tokens of each project
+            # print(PATH_PYTHON)
+            prepareToken(PATH_PYTHON, PATH_TOKEN, projectID)
 
-                # # convert dataframe to .csv file
-                # df.to_csv("mappingPython2Token.csv")
-                
-                # Clear all token files of the previous iteration
-                clearBefore(str(PATH_TOKEN)+"/"+projectID+"/", str(PATH_FILES), str(PATH_OUTPUT))
-                
-                calculateEntropy(str(PATH_MITLM))
-                
-                # Clear all csv files of the previous iteration
-                clearAfter(str(PATH_OUTPUT), str(PATH_ALL), projectID)
-                
-            except:
-                continue
-                
-        else:
-            continue
+            # # mapping directories of Python files with the directories of token files
+            # df = pd.DataFrame([(k, v) for k, v in d.items()], columns=['pythonPath', 'tokenPath'])
+            # #print(df)
+            # dict_token.append(d)
+
+            # # convert dataframe to .csv file
+            # df.to_csv("mappingPython2Token.csv")
+            
+            # Clear all token files of the previous iteration
+            clearBefore(str(PATH_TOKEN)+"/"+projectID+"/", str(PATH_FILES), str(PATH_OUTPUT))
+            
+            calculateEntropy(str(PATH_MITLM))
+            
+            # Clear all csv files of the previous iteration
+            clearAfter(str(PATH_OUTPUT), str(PATH_ALL), projectID)
+            
+        except OSError as osError:
+            logging.error(str(osError))
+            
+    else:
+        logging.info("{0}: doesn't exist".format(PATH_PYTHON))
 
 def dispatch_jobs(func, data):
     # Get the number of CPU cores
     numberOfCores = mp.cpu_count()
     # print(numberOfCores)
 
-    # Data split by number of cores
-    data_split = np.array_split(data, numberOfCores, axis=0)
-    # print(type(data_split[0]))
+    # set up logging to file
+    logging.basicConfig(filename='{0}.log'.format(func), filemode='w', level=logging.DEBUG)
+    install_mp_handler()
 
     with mp.Pool(processes=numberOfCores) as pool:
-        length = len(data_split)
+        length = len(data)
         with tqdm(total=length) as pbar:
-            for i, _ in enumerate(pool.map(func, data_split)):
+            for i, _ in enumerate(pool.map(func, data)):
                 pbar.update()
         pool.close()
         pool.join()

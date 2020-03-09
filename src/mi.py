@@ -5,16 +5,18 @@ from tqdm import tqdm, tnrange, tqdm_pandas
 import time
 import numpy as np
 
+# Multiprocessing
+import logging
 import multiprocessing as mp
+from multiprocessing_logging import install_mp_handler
 
-def buildWily(PATH_SAMPLE):
-    for PATH_PYTHON in PATH_SAMPLE:
-        # print(PATH_PYTHON)
-        os.chdir(str(PATH_PYTHON))
-        os.system("wily build .")
+def buildWily(PATH_PYTHON):
+    # print(PATH_PYTHON)
+    os.chdir(str(PATH_PYTHON))
+    os.system("wily build .")
     print("########### Building Wily Finished ############")
 
-def prepareHTML(PATH_SAMPLE):
+def prepareHTML(PATH_PYTHON):
     # Components of wily command
     command = "wily report "
     raw = " raw.loc raw.lloc raw.sloc raw.comments raw.multi raw.blank raw.single_comments"
@@ -24,33 +26,32 @@ def prepareHTML(PATH_SAMPLE):
     fragment = " -f HTML -n 1 -o "
     # print(PATH_HTML)
     # print(PATH_SAMPLE)
-    for PATH_PYTHON in PATH_SAMPLE:
-        # print(PATH_PYTHON)
-        projectID= PATH_PYTHON.name
-        
-        PATH_REPORT = Path(str(PATH_HTML)+"/"+projectID).resolve()
-        PATH_REPORT.mkdir(parents=True, exist_ok=True)
-        
-        # print(PATH_REPORT)
+    # print(PATH_PYTHON)
+    projectID = PATH_PYTHON.name
+    
+    PATH_REPORT = Path(str(PATH_HTML)+"/"+projectID).resolve()
+    PATH_REPORT.mkdir(parents=True, exist_ok=True)
+    
+    # print(PATH_REPORT)
 
-        files = list(PATH_PYTHON.rglob('*.py'))
-        # Get into the directory of the target project
-        os.chdir(str(PATH_PYTHON))
-        # os.system("pwd")
-        ID = 0
+    files = list(PATH_PYTHON.rglob('*.py'))
+    # Get into the directory of the target project
+    os.chdir(str(PATH_PYTHON))
+    # os.system("pwd")
+    ID = 0
 
-        for file in files:
-            # Get the sub-directory of target file
-            target = str(file).split(str(PATH_PYTHON)+"/")[-1]
-            #print(target)
-            html = str(ID)+".html"
-            #print(html)
-            wily = command + target + raw + cc + halstead + mi + fragment + str(PATH_REPORT) + "/" + html
-            # print(wily)
-            # Report all expected metics and save the result as html files in reports folder
-            os.system(wily)
-            
-            ID += 1
+    for file in files:
+        # Get the sub-directory of target file
+        target = str(file).split(str(PATH_PYTHON)+"/")[-1]
+        #print(target)
+        html = str(ID)+".html"
+        #print(html)
+        wily = command + target + raw + cc + halstead + mi + fragment + str(PATH_REPORT) + "/" + html
+        # print(wily)
+        # Report all expected metics and save the result as html files in reports folder
+        os.system(wily)
+        
+        ID += 1
     
     print("########### Prepare HTML Finished ############")
 
@@ -65,42 +66,41 @@ def cleanData(df):
     return df
 
 def convertHTML(PATH_HTML):
-    for PATH_SUB_HTML in PATH_HTML:
-        # print(PATH_SUB_HTML)
-        #print(PATH_SUB_HTML.name)
+    # print(PATH_SUB_HTML)
+    #print(PATH_SUB_HTML.name)
+    
+    projectID = PATH_HTML.name
+
+    # Create folder for storing .csv files by using project ID
+    PATH_SUB_METRIC = Path(str(PATH_METRIC)+"/"+projectID)
+    PATH_SUB_METRIC.mkdir(parents=True, exist_ok=True)
+
+    temp = pd.DataFrame([])
+
+    #print(PATH_SUB_METRIC)
+    files = PATH_HTML.rglob('*.html')
+    for file in files:
+        # print(files)
+        df = pd.read_html(str(file))
+        # csv = str(file.name).split(".html")[0]+".csv"
         
-        projectID= PATH_SUB_HTML.name
+        # print(str(PATH_SUB_METRIC)+"/"+csv)
+        # print(df[0])
 
-        # Create folder for storing .csv files by using project ID
-        PATH_SUB_METRIC = Path(str(PATH_METRIC)+"/"+projectID)
-        PATH_SUB_METRIC.mkdir(parents=True, exist_ok=True)
-
-        temp = pd.DataFrame([])
-
-        #print(PATH_SUB_METRIC)
-        files = PATH_SUB_HTML.rglob('*.html')
-        for file in files:
-            # print(files)
-            df = pd.read_html(str(file))
-            # csv = str(file.name).split(".html")[0]+".csv"
-            
-            # print(str(PATH_SUB_METRIC)+"/"+csv)
-            # print(df[0])
-
-            clean_df = cleanData(df[0])
-            
-            # print(clean_df)
-            temp = temp.append(clean_df, ignore_index=True)
-
-            # Get the metrics of lastest version of a project
-            # Export to .csv file
-            # df[0].to_csv(str(PATH_SUB_METRIC)+"/"+csv, index=False)
+        clean_df = cleanData(df[0])
         
-        # merge all data file and export them as .csv file for each project
-        project = pd.DataFrame(temp)
-        project.insert(0, 'project_id', projectID)
-        # print(project)
-        project.to_csv("{0}/{1}.csv".format(str(PATH_SUB_METRIC), projectID), index=False)
+        # print(clean_df)
+        temp = temp.append(clean_df, ignore_index=True)
+
+        # Get the metrics of lastest version of a project
+        # Export to .csv file
+        # df[0].to_csv(str(PATH_SUB_METRIC)+"/"+csv, index=False)
+    
+    # merge all data file and export them as .csv file for each project
+    project = pd.DataFrame(temp)
+    project.insert(0, 'project_id', projectID)
+    # print(project)
+    project.to_csv("{0}/{1}.csv".format(str(PATH_SUB_METRIC), projectID), index=False)
     print("########### Convert HTML Finished ############")
 
 def mergeCSV(PATH_METRIC, PATH_CSV):
@@ -160,16 +160,20 @@ def calculateMI(PATH_CSV):
 def dispatch_jobs(func, data):
     # Get the number of CPU cores
     numberOfCores = mp.cpu_count()
-    print(numberOfCores)
+    # print(numberOfCores)
 
     # Data split by number of cores
-    data_split = np.array_split(data, numberOfCores, axis=0)
+    # data_split = np.array_split(data, numberOfCores, axis=0)
     # print(type(data_split[0]))
 
+    # set up logging to file
+    logging.basicConfig(filename='{0}.log'.format(func), filemode='w', level=logging.DEBUG)
+    install_mp_handler()
+
     with mp.Pool(processes=numberOfCores) as pool:
-        length = len(data_split)
+        length = len(data)
         with tqdm(total=length) as pbar:
-            for i, _ in enumerate(pool.map(func, data_split)):
+            for i, _ in enumerate(pool.map(func, data)):
                 pbar.update()
         pool.close()
         pool.join()

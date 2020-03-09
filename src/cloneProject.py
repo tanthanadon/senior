@@ -1,11 +1,11 @@
 from pathlib import Path
 import pandas as pd
 import os
-import logging
 import time
 import numpy as np
 
 # Multiprocessing
+import logging
 import multiprocessing as mp
 from multiprocessing_logging import install_mp_handler
 
@@ -69,7 +69,7 @@ def dispatch_jobs(func, data):
     # print(numberOfCores)
 
     # Data split by number of cores
-    data_split = data
+    # data_split = data
     # print(data_split)
     # data_split = np.array_split(data, numberOfCores, axis=0)
     
@@ -78,9 +78,9 @@ def dispatch_jobs(func, data):
     install_mp_handler()
 
     with mp.Pool(processes=numberOfCores) as pool:
-        length = len(data_split)
+        length = len(data)
         with tqdm(total=length) as pbar:
-            for i, _ in enumerate(pool.map(func, data_split)):
+            for i, _ in enumerate(pool.map(func, data)):
                 pbar.update()
             pool.close()
             pool.join()
