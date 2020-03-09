@@ -47,15 +47,13 @@ def calculateCC(path_project):
     q = Path("{0}{1}".format(path_project, "/docs"))
     
     for file in path_project.rglob('*.py'):
-        if('test' not in str(file) and 'doc' not in str(file) and 'example' not in str(file)):
-            # print(file)
-            txt = open(str(file)).read()
-            try:
-                arr = mi_parameters(txt, count_multi=False)
-                cc += arr[1]
-                # print(mi_visit(txt, False))
-            except SyntaxError:
-                continue
+        txt = open(str(file)).read()
+        try:
+            arr = mi_parameters(txt, count_multi=False)
+            cc += arr[1]
+            # print(mi_visit(txt, False))
+        except SyntaxError:
+            continue
         # print("CC: {0}".format(cc))
     return cc
 
@@ -102,14 +100,11 @@ def mergeFile(path_project):
     merge = ""
     # Merge all .py files as one file
     # Then, input it into radon API(mi_visit) to calculate MI for each project
-    p = Path("{0}{1}".format(path_project, "/tests"))
-    q = Path("{0}{1}".format(path_project, "/docs"))
+
     
     for file in path_project.rglob('*.py'):
-        if('test' not in str(file) and 'doc' not in str(file) and 'example' not in str(file)):
-            # print(file)
-            txt = open(str(file)).read()
-            merge = merge + "\n" + txt
+        txt = open(str(file)).read()
+        merge = merge + "\n" + txt
     return merge
 
 def evaluate(PATH_SAMPLE):
