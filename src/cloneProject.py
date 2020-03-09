@@ -7,6 +7,7 @@ import numpy as np
 
 # Multiprocessing
 import multiprocessing as mp
+from multiprocessing_logging import install_mp_handler
 
 # To run external program
 import subprocess
@@ -22,7 +23,7 @@ PATH_CSV = Path('../csv/').resolve()
 PATH_CSV.mkdir(parents=True, exist_ok=True)
 
 #print(PATH_SAMPLE)
-print(PATH_CSV)
+# print(PATH_CSV)
 
 
 def getRepo(PATH_CSV):
@@ -42,33 +43,23 @@ def getRepo(PATH_CSV):
     df.to_csv(new_csv, index=False)
     print("\n########### Getting repo finished ##############\n")
     
-
 def cloneProject(df):
-    # print(df)
-    # os.chdir("{0}".format(PATH_SAMPLE))
-    # os.system("pwd")
+    project_id = df[0]
+    repo = df[-1]
 
-    # set up logging to file
-    logging.basicConfig(filename='cloningProject.log', filemode='w', level=logging.DEBUG, format='%(asctime)s %(message)s')
-
-    for index, row in df.iterrows():
-        # Change directory to the sample projects
-        # command = "{0}{1}".format("git clone https://github.com/", row['repo'])
-        command = "pwd"
+    # Change directory to the sample projects and save as project ID
+    command = "{0}{1} {2}".format("git clone https://github.com/", repo, project_id)
+    # print(command)
+    try:
         # print(command)
-        try:
-            # Clone each project to local repository in Sample directory
-            subprocess.check_output(command, cwd="{0}".format(PATH_SAMPLE), shell=True)
-            # os.system("git clone https://github.com/"+row['repo'])
+        # Clone each project to local repository in Sample directory
+        subprocess.check_call(command, cwd="{0}".format(PATH_SAMPLE), shell=True)
+        # os.system("git clone https://github.com/"+df)
 
-            project = Path("{0}/{1}".format(PATH_SAMPLE, row['repo'].split("/")[-1]))
-            # print(project.exists())
-            # Rename the project by project ID
-            project.rename("{0}".format(row['project_id']))
-        except subprocess.CalledProcessError as callError:
-            logging.error(str(callError))
-        except FileNotFoundError as fileError:
-            logging.error(str(fileError))
+    except subprocess.CalledProcessError as callError:
+        logging.error("CallProcessError: "+str(callError))
+    except OSError as osError:
+        logging.error("OSError: "+str(osError))
 
     print("\n########### Cloning repo finished ##############\n")
 
@@ -78,16 +69,21 @@ def dispatch_jobs(func, data):
     # print(numberOfCores)
 
     # Data split by number of cores
-    data_split = np.array_split(data, numberOfCores, axis=0)
-    # print(type(data_split[0]))
+    data_split = data
+    # print(data_split)
+    # data_split = np.array_split(data, numberOfCores, axis=0)
+    
+    # set up logging to file
+    logging.basicConfig(filename='cloningProject.log', filemode='w', level=logging.DEBUG)
+    install_mp_handler()
 
     with mp.Pool(processes=numberOfCores) as pool:
         length = len(data_split)
         with tqdm(total=length) as pbar:
             for i, _ in enumerate(pool.map(func, data_split)):
                 pbar.update()
-        pool.close()
-        pool.join()
+            pool.close()
+            pool.join()
 
     print("########### Dispatch jobs Finished ############")
 
@@ -95,14 +91,13 @@ start_time = time.time()
 if __name__ == "__main__":
 
     # Get repo for each project and save as csv file
-    # getRepo(PATH_CSV)
+    getRepo(PATH_CSV)
     
     # Read csv file that contains repository
-    # Clone projects to local repositories
     df = pd.read_csv('../csv/sample_repo.csv')
 
-    dispatch_jobs(cloneProject, df)
-
-    # cloneProject(PATH_SAMPLE, df)
+    # Clone projects to local repositories
+    data = df.values.tolist()
+    dispatch_jobs(cloneProject, data)
 
 print("--- %s seconds ---" % (time.time() - start_time))
