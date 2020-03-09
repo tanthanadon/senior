@@ -1,6 +1,7 @@
 import sys, token, tokenize
 from pathlib import Path
 import pandas as pd
+import numpy as np
 # For bash command
 import os
 # Measure compution time
@@ -9,6 +10,33 @@ import re
 
 # Progress bar
 from tqdm import trange, tqdm
+
+# Multiprocessing
+import multiprocessing as mp
+
+language = "python"
+    
+# Statis Paths
+PATH_SAMPLE = Path("../Sample_Projects/").resolve()
+PATH_TOKEN = Path("../all_tokens/").resolve()
+PATH_MITLM = Path("~/CacheModelPackage/").expanduser()
+PATH_FILES = Path(str(PATH_MITLM)+"/evaluation/data/"+language+"/").resolve()
+PATH_OUTPUT = Path(str(PATH_MITLM)+"/evaluation/results/entropy/"+language+"/").resolve()
+PATH_ALL = Path("../all_naturalness/").resolve()
+PATH_CSV = Path("../csv/").resolve()
+
+# Create the main directory for cloning projects
+PATH_SAMPLE.mkdir(parents=True, exist_ok=True)
+# Create the main directory for storing token files of all projects
+PATH_TOKEN.mkdir(parents=True, exist_ok=True)
+# Create the main directory for storing token files in CacheModelPackage porject
+PATH_FILES.mkdir(parents=True, exist_ok=True)
+# Create the main directory for storing the output from MITLM tool
+PATH_OUTPUT.mkdir(parents=True, exist_ok=True)
+# Create the main directory for storing csv files of all projects
+PATH_ALL.mkdir(parents=True, exist_ok=True)
+# Create the main directory for storing the final result of csv files of all projects
+PATH_CSV.mkdir(parents=True, exist_ok=True)
 
 
 def testWritingToken():
@@ -29,31 +57,30 @@ def testWritingToken():
 
 
 def tokenization(file):
-    file = open(file, encoding='utf-8', errors='ignore')
-    tokgen = tokenize.generate_tokens(file.readline)
-    line = ''
-    temp = ''
-    for toktype, ttext, (slineno, scol), (elineno, ecol), ltext in tokgen:
-        type1 = re.search("^'''", ttext)
-        type2 = re.search('^"""', ttext)
-        #print(repr(ttext))
-        #print(type1)
-        #print(type2)
-        #print(ttext)
-        if ttext != "\n" and bool(type1 or type2) == False:
-            if toktype != tokenize.COMMENT:
-                #print(repr(ttext))
-                if toktype == tokenize.STRING:
-                    temp = '<str>'
+    with open(file, encoding='utf-8', errors='ignore') as file:
+        tokgen = tokenize.generate_tokens(file.readline)
+        line = ''
+        temp = ''
+        for toktype, ttext, (slineno, scol), (elineno, ecol), ltext in tokgen:
+            type1 = re.search("^'''", ttext)
+            type2 = re.search('^"""', ttext)
+            #print(repr(ttext))
+            #print(type1)
+            #print(type2)
+            #print(ttext)
+            if ttext != "\n" and bool(type1 or type2) == False:
+                if toktype != tokenize.COMMENT:
+                    #print(repr(ttext))
+                    if toktype == tokenize.STRING:
+                        temp = '<str>'
+                        
+                    else:
+                        temp = ttext
+                    line = line + temp + ' '
+                    #print(repr(temp))
                     
-                else:
-                    temp = ttext
-                line = line + temp + ' '
-                #print(repr(temp))
-                
-    #print(line)
-    return line
-
+        #print(line)
+        return line
 
 def createTokenFile(pythonPath, tokenPath, tokenID):
     tokenLine = tokenization(str(pythonPath))
@@ -64,7 +91,7 @@ def createTokenFile(pythonPath, tokenPath, tokenID):
     with output.open(mode='w+') as file:
             file.write(tokenLine)
             file.close()
-    print(pythonPath.resolve())
+    # print(pythonPath.resolve())
     list = [str(pythonPath.resolve()), PATH_OUTPUT]
     return list
     
@@ -82,7 +109,7 @@ def prepareToken(PATH_PYTHON, PATH_TOKEN, projectID):
         tokenID = tokenID + 1
         d[pairDirList[0]] = pairDirList[1]
     print("############## Tokenization for "+PATH_PYTHON+" finished ################")
-    return d
+    # return d
     
 def clearBefore(PATH_TOKEN, PATH_FILES, PATH_OUTPUT):
     #print(PATH_TOKEN)
@@ -109,7 +136,7 @@ def calculateEntropy(PATH_MITLM):
     os.chdir(PATH_MITLM+'/evaluation')
     os.system("pwd")
     # Run shell script to calculate entropy for 1-10 grams
-    for i in range(1,16):
+    for i in range(1, 11):
         #os.system("sh python_example.sh "+str(i))
         #with 1-10 grams based on input $1
         os.system("mkdir -p ./results/entropy/python/summary")
@@ -157,18 +184,17 @@ def mergeCSV(PATH_CSV):
     # Reset index column to be a normal column
     df = df.reset_index()
     
-    print(df.columns[0:])
+    # print(df.columns[0:])
     
     # Change name index column to project_id
     df.rename(columns=lambda x: x+1 if x in df.columns[1:] else x, inplace = True)
     df.rename(columns={'index': 'project_id'}, inplace=True)
-    print(df)
+    # print(df)
     
     df = pd.melt(df, id_vars=["project_id"], var_name = ["order"], value_vars=df.columns[1:], value_name="cross-entropy")
-    print(df)
+    # print(df)
     # Save the final result into ../csv/naturalness_final.csv
     df.to_csv(str(FINAL_CSV)+"/naturalness_original.csv", index=False)
-    
     
     print("########### Merging CSV finished ############")
 
@@ -176,61 +202,14 @@ def mean(PATH_CSV):
     df = pd.read_csv("{0}/naturalness_original.csv".format(PATH_CSV))
     df = df.groupby(['project_id']).mean().reset_index()[['project_id', 'cross-entropy']]
     df.columns = ['project_id', 'cross-entropy_mean']
-    # print(df1)
-    print(df)
+    # print(df)
     df.to_csv("{0}/naturalness_final.csv".format(PATH_CSV), index=False)
 
-def main():
-    #testTokenization()
-    #testWritingToken()
-    #testExperiment()
-    language = "python"
-    
-    # Statis Paths
-    PATH_SAMPLE = Path("../Sample_Projects/").resolve()
-    PATH_TOKEN = Path("../all_tokens/").resolve()
-    PATH_MITLM = Path("~/CacheModelPackage/").expanduser()
-    PATH_FILES = Path(str(PATH_MITLM)+"/evaluation/data/"+language+"/").resolve()
-    PATH_OUTPUT = Path(str(PATH_MITLM)+"/evaluation/results/entropy/"+language+"/").resolve()
-    PATH_ALL = Path("../all_naturalness/").resolve()
-    PATH_CSV = Path("../csv/").resolve()
-
-    # Create the main directory for cloning projects
-    PATH_SAMPLE.mkdir(parents=True, exist_ok=True)
-    # Create the main directory for storing token files of all projects
-    PATH_TOKEN.mkdir(parents=True, exist_ok=True)
-    # Create the main directory for storing token files in CacheModelPackage porject
-    PATH_FILES.mkdir(parents=True, exist_ok=True)
-    # Create the main directory for storing the output from MITLM tool
-    PATH_OUTPUT.mkdir(parents=True, exist_ok=True)
-    # Create the main directory for storing csv files of all projects
-    PATH_ALL.mkdir(parents=True, exist_ok=True)
-    # Create the main directory for storing the final result of csv files of all projects
-    PATH_CSV.mkdir(parents=True, exist_ok=True)
-
-    #PATH_PYTHON = "/home/thanadon/Documents/Project/Sample_Projects/requests"
-    #print(PATH_PYTHON)
-    '''
-    print(PATH_SAMPLE.exists())
-    print(PATH_TOKEN.exists())
-    print(PATH_MITLM.exists())
-    print(PATH_FILES.exists())
-    print(PATH_OUTPUT.exists())
-    print(PATH_ALL.exists())
-
-    print(PATH_SAMPLE)
-    print(PATH_TOKEN)
-    print(PATH_MITLM)
-    print(PATH_FILES)
-    print(PATH_OUTPUT)
-    print(PATH_ALL)
-    '''
-
-    d = {}
+def experiment(PATH_SAMPLE):
     # Loop for all directories
     # check each item is a directory or not
-    '''
-    for PATH_PYTHON in PATH_SAMPLE.iterdir():
+    # dict_token = {}
+    for PATH_PYTHON in PATH_SAMPLE:
         #print(PATH_PYTHON)
         if PATH_PYTHON.is_dir():
             try:
@@ -240,14 +219,16 @@ def main():
                 #print(projectID)
                 
                 # Prepare tokens of each project
-                #print(PATH_PYTHON)
-                #d = prepareToken(PATH_PYTHON, PATH_TOKEN, projectID)
-                
-                # mapping directories of Python files with the directories of token files
-                #df = pd.DataFrame([(k, v) for k, v in d.items()], columns=['pythonPath', 'tokenPath'])
-                #print(df)
-                # convert dataframe to .csv file
-                #df.to_csv("mappingPython2Token.csv")
+                # print(PATH_PYTHON)
+                prepareToken(PATH_PYTHON, PATH_TOKEN, projectID)
+    
+                # # mapping directories of Python files with the directories of token files
+                # df = pd.DataFrame([(k, v) for k, v in d.items()], columns=['pythonPath', 'tokenPath'])
+                # #print(df)
+                # dict_token.append(d)
+
+                # # convert dataframe to .csv file
+                # df.to_csv("mappingPython2Token.csv")
                 
                 # Clear all token files of the previous iteration
                 clearBefore(str(PATH_TOKEN)+"/"+projectID+"/", str(PATH_FILES), str(PATH_OUTPUT))
@@ -262,10 +243,39 @@ def main():
                 
         else:
             continue
-    '''
-    mergeCSV(PATH_ALL)
-    mean(PATH_CSV)
+
+def dispatch_jobs(func, data):
+    # Get the number of CPU cores
+    numberOfCores = mp.cpu_count()
+    # print(numberOfCores)
+
+    # Data split by number of cores
+    data_split = np.array_split(data, numberOfCores, axis=0)
+    # print(type(data_split[0]))
+
+    with mp.Pool(processes=numberOfCores) as pool:
+        length = len(data_split)
+        with tqdm(total=length) as pbar:
+            for i, _ in enumerate(pool.map(func, data_split)):
+                pbar.update()
+        pool.close()
+        pool.join()
+
+    print("########### Dispatch jobs Finished ############")
 
 start_time = time.time()
-main()
+if __name__ == "__main__":
+    #testTokenization()
+    #testWritingToken()
+    #testExperiment()
+
+    # Run all functions to calculate crosss-entropy for each project
+    sample = list(PATH_SAMPLE.iterdir())
+    dispatch_jobs(experiment, sample)
+
+    # Merge .csv file that contains cross-entropy (1-10 grams) for each project
+    mergeCSV(PATH_ALL)
+
+    # mean(PATH_CSV)
+
 print("--- %s seconds ---" % (time.time() - start_time))
