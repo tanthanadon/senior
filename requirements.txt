@@ -60,7 +60,7 @@ olefile==0.45.1
 pandas==0.25.3
 paramiko==2.6.0
 pexpect==4.2.1
-Pillow==5.1.0
+Pillow==6.2.0
 plotly==4.4.1
 progress==1.4
 protobuf==3.11.1
