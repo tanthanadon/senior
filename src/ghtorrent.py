@@ -7,7 +7,13 @@ import csv
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-PATH_CSV = Path("../csv").resolve()
+import requests
+from bs4 import BeautifulSoup
+
+PATH_CSV = Path("../csv/368").resolve()
+
+def convertProjectID(arr):
+    return ' ,'.join(map(str, arr))
 
 def query(q):
     conn = mysql.connector.connect(host="localhost", user="benjaporn", passwd="bee", database="ghtorrent")
@@ -33,7 +39,7 @@ def detect_outlier(df):
     return (df.loc[df['bytes'].apply(lambda y: (np.abs((y - mean_1)/std_1) <= threshold) & (y <= upper) & (y >= lower) & (y > 0) )])
 
 def totalBytes():
-    q = """SELECT * FROM projects, project_languages
+    q = """SELECT projects.*, project_languages.language, project_languages.bytes FROM projects, project_languages
             WHERE project_languages.language = 'python' AND projects.id = project_languages.project_id AND projects.language = 'python' 
             AND deleted != 1 AND bytes % 100 = 0 AND bytes > 1000
             LIMIT 2000"""
@@ -41,13 +47,16 @@ def totalBytes():
     
     for i in range(10):
         df = detect_outlier(df)
+    
     print(df['bytes'].sum())
+    
+    df.rename(columns={'id': 'project_id'}, inplace=True)
+    df.sort_values('project_id', ascending=True, inplace=True)
     print(df)
 
     sns.violinplot(df['bytes'])
     plt.show()
     df.to_csv("{0}/totalBytes.csv".format(PATH_CSV), index=False)
-
 
 def totalCommitsAuthor(project_id):
     q = """SELECT  commits.project_id, author_id, COUNT(commits.id) as total_commit_author
@@ -55,10 +64,11 @@ def totalCommitsAuthor(project_id):
             WHERE commits.project_id IN ({0}) 
             AND users.id = commits.author_id 
             AND users.deleted != 1 AND users.fake != 1
-            GROUP BY commits.project_id, author_id""".format(project_id)
+            GROUP BY commits.project_id, author_id
+            """.format(project_id)
     df = query(q)
     print(df)
-    df.to_csv("{0}/totalCommitsAuthor.csv".format(PATH_CSV), index=False)
+    df.to_csv("{0}/10000/totalCommitsAuthor.csv".format(PATH_CSV), index=False)
 
 def totalCommitsProject(project_id):
     q = """SELECT  commits.project_id, COUNT(commits.id) as total_commit_project
@@ -72,8 +82,16 @@ def totalCommitsProject(project_id):
     print(df)
     df.to_csv("{0}/totalCommitsProject.csv".format(PATH_CSV), index=False)
 
+def dataSampling_953projects():
+    projects = pd.read_csv('../csv_368projects/dataSampling_comparedDate.csv')
+    # projects = pd.read_csv('../csv_953projects/dataSampling_inactive.csv')
+    projects = projects.loc[projects['comparedDate'] == True]
+    projects = projects.loc[projects['original_project'] == 'YES']
+    print(projects)
+    projects.to_csv("{0}/dataSampling_368projects.csv".format(PATH_CSV), index=False)
+
 def totalAuthorProject(project_id):
-    q = """SELECT commits.project_id, COUNT(DISTINCT users.id) as total_author
+    q = """SELECT commits.project_id as id, COUNT(DISTINCT users.id) as total_author
             FROM users, commits
             WHERE commits.project_id  IN ({0}) 
             AND users.id = commits.author_id 
@@ -81,8 +99,21 @@ def totalAuthorProject(project_id):
             GROUP BY commits.project_id
             ORDER By commits.project_id""".format(project_id)
     df = query(q)
-    print(df)
-    df.to_csv("{0}/totalAuthorProject.csv".format(PATH_CSV), index=False)
+    # projects = pd.read_csv('../csv_953projects/dataSampling_comparedDate.csv')
+    # projects = projects.loc[projects['comparedDate'] == True]
+    # print(projects)
+    projects = pd.read_csv('../csv_368projects/dataSampling_953projects.csv')
+    # projects = pd.read_csv('../csv_953projects/dataSampling_inactive.csv')
+    merged = pd.merge(df, projects, on='id', how='right')
+    merged = merged.replace(np.nan, 0)
+    merged['total_author'] = merged['total_author'].astype(int)
+    merged = merged.loc[merged['total_author'] != 0]
+    merged = merged.loc[merged['original_project'] == 'YES']
+    print(merged)
+    merged.to_csv("{0}/dataSampling_368projects.csv".format(PATH_CSV), index=False)
+
+    merged = merged[['id', 'total_author']]
+    merged.to_csv("{0}/totalAuthor.csv".format(PATH_CSV), index=False)
 
 def majorMinor(project_id):
     totalCommitsProject = pd.read_csv("{0}/totalCommitsProject.csv".format(PATH_CSV))
@@ -165,7 +196,7 @@ def selfApprChange(project_id):
 
 def withoutDiscussion(project_id):
     totalCommitsProject = pd.read_csv("{0}/totalCommitsProject.csv".format(PATH_CSV))
-    print(totalCommitsProject)
+    # print(totalCommitsProject)
     q = """SELECT project_id, pull_request_comments.pull_request_id, COUNT(pull_request_comments.commit_id) AS numOfCommits
             FROM pull_request_history
             INNER JOIN pull_request_comments ON pull_request_comments.pull_request_id = pull_request_history.pull_request_id
@@ -184,27 +215,40 @@ def withoutDiscussion(project_id):
     df.to_csv("{0}/withoutDiscussion.csv".format(PATH_CSV), index=False)
 
 def typicalReviewWindow(project_id):
-    q = """SELECT project_id, pull_request_history.pull_request_id, pull_request_history.created_at AS pull_request_created_at, pull_request_history.action, pull_request_history.actor_id, pull_request_comments.commit_id, pull_request_comments.user_id
-            FROM pull_request_history
-            INNER JOIN pull_request_comments ON pull_request_comments.pull_request_id = pull_request_history.pull_request_id
-            INNER JOIN commits ON commits.id = pull_request_comments.commit_id
-            WHERE project_id IN ({0})
-            ORDER BY project_id, pull_request_comments.created_at DESC""".format(project_id)
-    df = query(q)
-    pull_request_id = ' ,'.join(map(str, df['pull_request_id']))
-    # print(pull_request_id)
-    r = """SELECT timeopen.pull_request_id, TIMEDIFF(timeclose.created_at ,timeopen.created_at) as differenttime FROM 
+    q = """ SELECT pull_requests.head_repo_id as project_id, timeopen.pull_request_id as pull_request_id, TIMEDIFF(timeclose.created_at ,timeopen.created_at) as differenttime FROM 
 	(SELECT pull_request_id, created_at 
     FROM pull_request_history 
-    WHERE pull_request_id IN ({0}) and action = 'opened') as timeopen,
+    WHERE pull_request_id IN ( SELECT id as pull_request_id FROM pull_requests WHERE head_repo_id IN ({0})) and action = 'opened') as timeopen,
     (SELECT pull_request_id, created_at 
     FROM pull_request_history 
-    WHERE pull_request_id IN ({0}) and action = 'merged') as timeclose
-    WHERE timeopen.pull_request_id = timeclose.pull_request_id""".format(pull_request_id)
+    WHERE pull_request_id IN ( SELECT id as pull_request_id FROM pull_requests WHERE head_repo_id IN ({0})) and action = 'closed') as timeclose, pull_requests
+    WHERE timeopen.pull_request_id = timeclose.pull_request_id AND timeopen.pull_request_id = pull_requests.id""".format(project_id)
+    df = query(q)
+    # df = df.groupby(['head_repo_id'])['differenttime'].sum()
+    # print(df[df['project_id'] == 11161411].head())
+    df['differenttime'] = convertTime(df)
+    # print(df.groupby(['project_id'])['differenttime'].sum())
+    df = df.groupby(['project_id'], as_index=False)['differenttime'].mean()
+    df.columns = ['project_id', 'lenghtOfTime']
+    print(df)
+    
+    # Normalized by churn
+  
+def convertTime(df):
+    temp = []
+    for index, row in df.iterrows():
+        t = row['differenttime'].components
+        temp.append(t.days*3600*24 + t.hours*3600 + t.minutes*60 + t.seconds)
+    # print(temp)
+    # print(df)
+    return pd.DataFrame(temp, columns=['differenttime'])
 
-    x = query(r)
-    
-    
+def mergeDF(sample, target):
+    merged = pd.merge(sample, target, on='id', how='right')
+    merged = merged.replace(np.nan, 0)
+    merged['fork_count'] = merged['fork_count'].astype(int)
+    merged = merged[['id', 'fork_count']]
+
 def merged():
 
     df = pd.read_csv('../csv/merged_naturalness_final.csv')
@@ -296,13 +340,22 @@ def mergedZero():
     print(merged)
     merged.to_csv("{0}/mergedZero.csv".format(PATH_CSV), index=False)
 
-def priorDefects():
-
-    df = pd.read_csv('../csv/totalAuthorProject.csv')
-    df1 = pd.read_csv('../csv/PriorDefects.csv')
+def priorDefects(project_id):
+    arr_project_id = [int(i) for i in project_id.split(',')] 
+    sample = pd.DataFrame({'project_id': arr_project_id})
+    # print(df)
    
-    df = df[['project_id']]
-    merged = pd.merge(df, df1, left_on='project_id', right_on='repo_id', how='left')
+    q = """SELECT issues.repo_id, COUNT(DISTINCT issues.id) as numOfPriorDefects, issue_events.action FROM repo_labels
+        INNER JOIN issue_labels ON repo_labels.id = issue_labels.label_id
+        iNNER JOIN issues ON issue_labels.issue_id = issues.id
+        INNER JOIN issue_events ON issue_events.issue_id = issues.id
+        WHERE repo_labels.repo_id IN ({0}) AND issue_events.action = "closed"
+        GROUP BY issues.repo_id
+        """.format(project_id)
+
+    df = query(q)
+
+    merged = pd.merge(sample, df, left_on='project_id', right_on='repo_id', how='left')
 
     merged = merged.drop('action', 1)
     merged = merged.replace(np.nan, 0).astype(int)
@@ -311,18 +364,203 @@ def priorDefects():
 
     merged.to_csv("{0}/priorDefects.csv".format(PATH_CSV), index=False)
 
-def convertProjectID(arr):
-    return ' ,'.join(map(str, arr))
+def getFork(project_id, df):
+    # print(df['url'])
+    temp = []
+    for i in df['url']:
+        URL = "{0}".format(i)
+        # print(URL)
 
-def main():
+        # sending get request and saving the response as response object 
+        headers = {'Authorization': 'token 4fae0c5f5db3a6fe3c24cd9ff7a3581753513b44'}
+        r = requests.get(url = URL, headers=headers)
+        # print(r)
+        # extracting data in json format 
+        data = r.json()
+        # print(data)
+        # temp.insert(json_normalize(data))
+        # print(pd.DataFrame.from_dict(data), orient='index')
+        # temp.insert(data)
+        # print(data['stargazers_count'])
+        try:
+            temp.append(data['forks_count'])
+        except KeyError:
+            temp.append(-1)
+    # print(temp)
+    df['fork_count'] = temp
+    df = df[['id', 'fork_count']]
+    print(df)
+    df.to_csv("{0}/fork_count.csv".format(PATH_CSV), index=False)
+
+def mergedPullrequest(project_id):
+    q = """SELECT pull_requests.head_repo_id as id, COUNT(DISTINCT pull_request_history.pull_request_id) as mergedPullrequest_count, pull_request_history.action as action FROM pull_requests
+            INNER JOIN pull_request_history ON pull_requests.id = pull_request_history.pull_request_id
+            WHERE head_repo_id IN ({0}) 
+            AND action = "merged"
+            GROUP BY pull_requests.head_repo_id""".format(project_id)
+    df = query(q)
+    # print(df)
+    projects = pd.read_csv('../csv/dataSampling_1000.csv')
+    # print(projects)
+    merged = pd.merge(df, projects, on='id', how='right')
+    # merged = projects.merge(df, on='id')
+    # df = projects.merge(df, on='id')
+    merged = merged.replace(np.nan, 0)
+    merged['mergedPullrequest_count'] = merged['mergedPullrequest_count'].astype(int)
+    merged = merged[['id', 'mergedPullrequest_count', 'action']]
+    print(merged)
+    df.to_csv("{0}/mergedPullrequest.csv".format(PATH_CSV), index=False)
+
+def openPullrequest(project_id):
+    q = """SELECT pull_requests.head_repo_id as id, COUNT(DISTINCT pull_request_history.pull_request_id) as openPullrequest_count, pull_request_history.action FROM pull_requests
+            INNER JOIN pull_request_history ON pull_requests.id = pull_request_history.pull_request_id
+            WHERE head_repo_id IN ({0}) 
+            AND action = "opened"
+            GROUP BY pull_requests.head_repo_id""".format(project_id)
+    df = query(q)
+    # print(df)
+    projects = pd.read_csv('../csv/dataSampling_1000.csv')
+    # print(projects)
+    merged = pd.merge(df, projects, on='id', how='right')
+    # merged = projects.merge(df, on='id')
+    # df = projects.merge(df, on='id')
+    merged = merged.replace(np.nan, 0)
+    merged['openPullrequest_count'] = merged['openPullrequest_count'].astype(int)
+    merged = merged[['id', 'openPullrequest_count', 'action']]
+    print(merged)
+    df.to_csv("{0}/openPullrequest.csv".format(PATH_CSV), index=False)
+
+def closedPullrequest(project_id):
+    q = """SELECT pull_requests.head_repo_id as id, COUNT(DISTINCT pull_request_history.pull_request_id) as closedPullrequest_count, pull_request_history.action as action FROM pull_requests
+            INNER JOIN pull_request_history ON pull_requests.id = pull_request_history.pull_request_id
+            WHERE head_repo_id IN ({0}) 
+            AND action = "closed"
+            GROUP BY pull_requests.head_repo_id""".format(project_id)
+    df = query(q)
+    # print(df)
+    projects = pd.read_csv('../csv/dataSampling_1000.csv')
+    # print(projects)
+    merged = pd.merge(df, projects, on='id', how='right')
+    # merged = projects.merge(df, on='id')
+    # df = projects.merge(df, on='id')
+    merged = merged.replace(np.nan, 0)
+    merged['closedPullrequest_count'] = merged['closedPullrequest_count'].astype(int)
+    merged = merged[['id', 'closedPullrequest_count', 'action']]
+    print(merged)
+    df.to_csv("{0}/closedPullrequest.csv".format(PATH_CSV), index=False)
+
+def closedIssue(project_id):
+    q = """SELECT issues.repo_id as id, COUNT(DISTINCT issues.id) as closedIssue_count , issue_events.action FROM issues 
+            INNER JOIN issue_events ON issue_events.issue_id = issues.id
+            WHERE issues.repo_id IN ({0}) 
+            AND issue_events.action = "closed"
+            GROUP BY issues.repo_id, issue_events.action""".format(project_id)
+    df = query(q)
+    # print(df)
+    projects = pd.read_csv('../csv/dataSampling_1000.csv')
+    # print(projects)
+    merged = pd.merge(df, projects, on='id', how='right')
+    # merged = projects.merge(df, on='id')
+    # df = projects.merge(df, on='id')
+    merged = merged.replace(np.nan, 0)
+    merged['closedIssue_count'] = merged['closedIssue_count'].astype(int)
+    merged = merged[['id', 'closedIssue_count', 'action']]
+    print(merged)
+    df.to_csv("{0}/closedIssue.csv".format(PATH_CSV), index=False)
+
+def openIssue(project_id):
+    q = """SELECT issues.repo_id as id, COUNT(DISTINCT issues.id) as openIssue_count FROM issues 
+            INNER JOIN issue_events ON issue_events.issue_id = issues.id
+            WHERE issues.repo_id IN ({0}) 
+            AND issue_events.action != "closed"
+            GROUP BY issues.repo_id""".format(project_id)
+    df = query(q)
+    # print(df)
+    projects = pd.read_csv('../csv/dataSampling_1000.csv')
+    # print(projects)
+    merged = pd.merge(df, projects, on='id', how='right')
+    # merged = projects.merge(df, on='id')
+    # df = projects.merge(df, on='id')
+    merged = merged.replace(np.nan, 0)
+    merged['openIssue_count'] = merged['openIssue_count'].astype(int)
+    merged = merged[['id', 'openIssue_count']]
+    print(merged)
+    df.to_csv("{0}/openIssue.csv".format(PATH_CSV), index=False)
+
+def fork(project_id):
+    q = """SELECT forked_from as id, COUNT(DISTINCT id) as fork_count FROM projects WHERE forked_from IN ({0}) 
+            GROUP BY forked_from""".format(project_id)
+    df = query(q)
+    
+    print(merged)
+    df.to_csv("{0}/fork.csv".format(PATH_CSV), index=False)
+
+def getHTML(api_url):
+    URL = "{0}".format(api_url)
+    # print(URL)
+
+    # sending get request and saving the response as response object 
+    headers = {'Authorization': 'token 4fae0c5f5db3a6fe3c24cd9ff7a3581753513b44'}
+    r = requests.get(url = URL, headers=headers)
+    # extracting data in json format 
+    data = r.json()
+    return data['html_url']
+
+def getIssues(df):
+    op = []
+    close = []
+    for i in df['url']:
+        html = getHTML(i)
+        url = "{0}/{1}".format(html, 'issues')
+        
+        r = requests.get(url)
+        soup = BeautifulSoup(r.content, "html.parser")
+        data = soup.find_all("a", attrs={'class': 'btn-link'})
+        # print(data)
+        for i in range(2):
+            num = data[i].get_text().strip().split(" ")[0]
+            if(i == 0):
+                op.append(num)
+            else:
+                close.append(num)
+    
+    df['open_issue'] = op
+    df['close_issue'] = close
+
+    return df
+
+def getPulls(df):
+    op = []
+    close = []
+    for i in df['url']:
+        html = getHTML(i)
+        url = "{0}/{1}".format(html, 'pulls')
+        
+        r = requests.get(url)
+        soup = BeautifulSoup(r.content, "html.parser")
+        data = soup.find_all("a", attrs={'class': 'btn-link'})
+        # print(data)
+        for i in range(2):
+            num = data[i].get_text().strip().split(" ")[0]
+            if(i == 0):
+                op.append(num)
+            else:
+                close.append(num)
+    
+    df['open_pull'] = op
+    df['close_pull'] = close
+
+    return df
+    
+start_time = time.time()
+if __name__ == "__main__":
     # Create the main directory for storing csv projects
-    # df = pd.read_csv("{0}/{1}".format(PATH_CSV, "sample_repo.csv"), index_col=0)
-    df = pd.read_csv("{0}/{1}".format(PATH_CSV, "totalBytes.csv"), index_col=0)
-    project_id = convertProjectID(df['project_id'])
+    df = pd.read_csv("{0}/{1}".format(PATH_CSV, "dataSampling_368projects.csv"))
+    # df = pd.read_csv("{0}/{1}".format(PATH_CSV, "totalBytes.csv"), index_col=0)
+    project_id = convertProjectID(df['id'])
+    # dataSampling_953projects()
     # print(project_id)
-
-    totalBytes()
-
+    # totalBytes()
     # totalCommitsAuthor(project_id)
     # totalCommitsProject(project_id)
     # totalAuthorProject(project_id)
@@ -333,13 +571,27 @@ def main():
     # withoutDiscussion(project_id)
     # typicalReviewWindow(project_id)
     # merged()
-    # priorDefects()
+    # priorDefects(project_id)
     # mergedZero()
-
     # commit = pd.read_csv("/home/senior/senior/csv/totalAuthorProject.csv")
+    # mergedPullrequest(project_id)
+    # issue = getIssues(df)
+    # final = getPulls(issue)
+    # print(final)
+    # final.to_csv("{0}/dataSampling_final.csv".format(PATH_CSV), index=False)
+    # getFork(project_id, df)
+    # union()
+
+    # mergedPullrequest(project_id)
+
+    # openPullrequest(project_id)
+    fork(project_id)
+
+    # closedPullrequest(project_id)
+    # closedIssue(project_id)
+    # openIssue(project_id)
+
+    
 
 
-start_time = time.time()
-
-main()
 print("--- %s seconds ---" % (time.time() - start_time))
