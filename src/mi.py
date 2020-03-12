@@ -167,7 +167,7 @@ def dispatch_jobs(func, data):
     # print(type(data_split[0]))
 
     # set up logging to file
-    logging.basicConfig(filename='{0}.log'.format(func), filemode='w', level=logging.DEBUG)
+    logging.basicConfig(filename='{0}.log'.format(func), filemode='w', level=logging.ERROR)
     install_mp_handler()
 
     with mp.Pool(processes=numberOfCores) as pool:

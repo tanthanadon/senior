@@ -1,1 +1,1 @@
-from __future__ import unicode_literals from django . db import migrations , models class Migration ( migrations . Migration ) :      dependencies = [ ( <str> , <str> ) , ] operations = [ migrations . AlterField ( model_name = <str> , name = <str> , field = models . ForeignKey ( to = <str> , null = True , on_delete = models . CASCADE ) , ) , ]   
+from __future__ import unicode_literals from django . db import migrations , models class Migration ( migrations . Migration ) :      dependencies = [ ( <str> , <str> ) , ( <str> , <str> ) , ] operations = [ ]   

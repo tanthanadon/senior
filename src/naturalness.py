@@ -19,13 +19,13 @@ from multiprocessing_logging import install_mp_handler
 language = "python"
     
 # Statis Paths
-PATH_SAMPLE = Path("../Sample_Projects/").resolve()
+PATH_SAMPLE = Path("../Sample_Projects/round_2").resolve()
 PATH_TOKEN = Path("../all_tokens/").resolve()
 PATH_MITLM = Path("~/CacheModelPackage/").expanduser()
 PATH_FILES = Path(str(PATH_MITLM)+"/evaluation/data/"+language+"/").resolve()
 PATH_OUTPUT = Path(str(PATH_MITLM)+"/evaluation/results/entropy/"+language+"/").resolve()
 PATH_ALL = Path("../all_naturalness/").resolve()
-PATH_CSV = Path("../csv/").resolve()
+PATH_CSV = Path("../csv/round_2").resolve()
 
 # Create the main directory for cloning projects
 PATH_SAMPLE.mkdir(parents=True, exist_ok=True)
@@ -214,43 +214,45 @@ def mean(PATH_CSV):
     # print(df)
     df.to_csv("{0}/naturalness_final.csv".format(PATH_CSV), index=False)
 
-def experiment(PATH_PYTHON):
+def run():
     # Loop for all directories
     # check each item is a directory or not
-    # dict_token = {}
-    #print(PATH_PYTHON)
-    if PATH_PYTHON.is_dir():
-        try:
-            
-            # Get the name of project from the directory
-            projectID = PATH_PYTHON.name
-            #print(projectID)
-            
-            # Prepare tokens of each project
-            # print(PATH_PYTHON)
-            prepareToken(PATH_PYTHON, PATH_TOKEN, projectID)
+    logging.basicConfig(filename='run.log', filemode='w', level=logging.ERROR)
+    for PATH_PYTHON in  PATH_SAMPLE.iterdir():
+        # dict_token = {}
+        #print(PATH_PYTHON)
+        if PATH_PYTHON.is_dir():
+            try:
+                
+                # Get the name of project from the directory
+                projectID = PATH_PYTHON.name
+                #print(projectID)
+                
+                # Prepare tokens of each project
+                # print(PATH_PYTHON)
+                prepareToken(PATH_PYTHON, PATH_TOKEN, projectID)
 
-            # # mapping directories of Python files with the directories of token files
-            # df = pd.DataFrame([(k, v) for k, v in d.items()], columns=['pythonPath', 'tokenPath'])
-            # #print(df)
-            # dict_token.append(d)
+                # # mapping directories of Python files with the directories of token files
+                # df = pd.DataFrame([(k, v) for k, v in d.items()], columns=['pythonPath', 'tokenPath'])
+                # #print(df)
+                # dict_token.append(d)
 
-            # # convert dataframe to .csv file
-            # df.to_csv("mappingPython2Token.csv")
-            
-            # Clear all token files of the previous iteration
-            clearBefore(str(PATH_TOKEN)+"/"+projectID+"/", str(PATH_FILES), str(PATH_OUTPUT))
-            
-            calculateEntropy(str(PATH_MITLM))
-            
-            # Clear all csv files of the previous iteration
-            clearAfter(str(PATH_OUTPUT), str(PATH_ALL), projectID)
-            
-        except OSError as osError:
-            logging.error(str(osError))
-            
-    else:
-        logging.info("{0}: doesn't exist".format(PATH_PYTHON))
+                # # convert dataframe to .csv file
+                # df.to_csv("mappingPython2Token.csv")
+                
+                # Clear all token files of the previous iteration
+                clearBefore(str(PATH_TOKEN)+"/"+projectID+"/", str(PATH_FILES), str(PATH_OUTPUT))
+                
+                calculateEntropy(str(PATH_MITLM))
+                
+                # Clear all csv files of the previous iteration
+                clearAfter(str(PATH_OUTPUT), str(PATH_ALL), projectID)
+                
+            except OSError as osError:
+                logging.error("{0}: {1}".format(PATH_PYTHON.name, osError))
+                
+        else:
+            logging.info("{0}: doesn't exist".format(PATH_PYTHON.name))
 
 def dispatch_jobs(func, data):
     # Get the number of CPU cores
@@ -258,7 +260,7 @@ def dispatch_jobs(func, data):
     # print(numberOfCores)
 
     # set up logging to file
-    logging.basicConfig(filename='{0}.log'.format(func), filemode='w', level=logging.DEBUG)
+    logging.basicConfig(filename='{0}.log'.format(func), filemode='w', level=logging.ERROR)
     install_mp_handler()
 
     with mp.Pool(processes=numberOfCores) as pool:
@@ -278,8 +280,9 @@ if __name__ == "__main__":
     #testExperiment()
 
     # Run all functions to calculate crosss-entropy for each project
-    sample = list(PATH_SAMPLE.iterdir())
-    dispatch_jobs(experiment, sample)
+    # sample = list(PATH_SAMPLE.iterdir())
+    # dispatch_jobs(experiment, sample)
+    run()
 
     # Merge .csv file that contains cross-entropy (1-10 grams) for each project
     mergeCSV(PATH_ALL)

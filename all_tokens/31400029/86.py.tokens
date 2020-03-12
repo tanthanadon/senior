@@ -1,1 +1,1 @@
-from __future__ import unicode_literals from django . db import migrations class Migration ( migrations . Migration ) :      dependencies = [ ( <str> , <str> ) , ] operations = [ migrations . RemoveField ( model_name = <str> , name = <str> , ) , migrations . DeleteModel ( name = <str> , ) , ]   
+from __future__ import unicode_literals from django . db import migrations , models class Migration ( migrations . Migration ) :      dependencies = [ ( <str> , <str> ) , ( <str> , <str> ) , ] operations = [ ]   

@@ -1,1 +1,1 @@
-from __future__ import absolute_import  
+from __future__ import unicode_literals from django . db import migrations , models class Migration ( migrations . Migration ) :      dependencies = [ ( <str> , <str> ) , ] operations = [ migrations . RenameField ( model_name = <str> , old_name = <str> , new_name = <str> , ) , migrations . RenameField ( model_name = <str> , old_name = <str> , new_name = <str> , ) , ]   
