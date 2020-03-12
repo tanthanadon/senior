@@ -10,7 +10,9 @@ import matplotlib.pyplot as plt
 import requests
 from bs4 import BeautifulSoup
 
-PATH_CSV = Path("../csv/368").resolve()
+from datetime import datetime
+
+PATH_CSV = Path("../csv/round_2").resolve()
 
 def convertProjectID(arr):
     return ' ,'.join(map(str, arr))
@@ -552,12 +554,71 @@ def getPulls(df):
 
     return df
     
+def maxDaysWithoutCommits(project_id):
+    q = """SELECT project_id, id as commit_id, created_at FROM commits
+            WHERE commits.project_id IN ({0})
+            ORDER BY commits.created_at
+            """.format(project_id)
+    df = query(q)
+    # 43033531, 52922816
+    # print(df)
+    ls = []
+    projectID = df['project_id'].unique()
+    # print(projectID)
+    for ID in projectID:
+        d = df[df['project_id']==ID]
+        d.reset_index(inplace=True)
+        # print(d)
+        # print(len(d))
+        # print(d.size)
+        for index, row in d.iterrows():
+            # print(index)
+            if(len(d) > 1):
+                if(index < len(d)-1):
+                    before = d.loc[index, "created_at"]
+                    # print(before)
+                    after = d.loc[index+1, "created_at"]
+                    # print(after)
+                    day_diff = abs(after - before)
+                    # print(day_diff.days)
+                    ls.append(day_diff.days)
+                    # print("\n")
+                else:
+                    # print("last index: ".format(index))
+                    before = d.loc[index-1, "created_at"]
+                    # print(before)
+                    after = d.loc[index, "created_at"]
+                    # print(after)
+                    day_diff = abs(after - before)
+                    # print(day_diff.days)
+                    ls.append(day_diff.days)
+                    # print("\n")
+            else:
+                ls.append(0)
+
+    df['max_day_diff'] = ls
+ 
+    # df = df.agg('max')
+
+    # df['max_day_diff'] = df['day_diff'].agg('max')
+    
+    
+    # print(df)
+    # df = pd.DataFrame(df)
+    # print(df.groupby("project_id").max())
+    result = df.groupby("project_id").max()
+    # result = result[['max_day_diff']]
+    result.reset_index(inplace=True)
+    print(result)
+    result.to_csv("{0}/maxDaysWithoutCommits.csv".format(PATH_CSV), index=False)
+
+
 start_time = time.time()
 if __name__ == "__main__":
     # Create the main directory for storing csv projects
-    df = pd.read_csv("{0}/{1}".format(PATH_CSV, "dataSampling_368projects.csv"))
+    df = pd.read_csv("{0}/{1}".format(PATH_CSV, "dataSampling_final.csv"))
     # df = pd.read_csv("{0}/{1}".format(PATH_CSV, "totalBytes.csv"), index_col=0)
-    project_id = convertProjectID(df['id'])
+    project_id = convertProjectID(df['project_id'])
     # dataSampling_953projects()
     # print(project_id)
     # totalBytes()
@@ -585,12 +646,13 @@ if __name__ == "__main__":
     # mergedPullrequest(project_id)
 
     # openPullrequest(project_id)
-    fork(project_id)
+    # fork(project_id)
 
     # closedPullrequest(project_id)
     # closedIssue(project_id)
     # openIssue(project_id)
 
+    maxDaysWithoutCommits(project_id)
     
 
 
