@@ -183,11 +183,11 @@ def dispatch_jobs(func, data):
 start_time = time.time()
 if __name__ == "__main__":
     # Static Paths
-    PATH_SAMPLE = Path("../Sample_Projects/").resolve()
+    PATH_SAMPLE = Path("../Sample_Projects/round_2").resolve()
     # Create the main directory for cloning projects
     PATH_SAMPLE.mkdir(parents=True, exist_ok=True)
 
-    PATH_CSV = Path("../csv").resolve()
+    PATH_CSV = Path("../csv/round_2").resolve()
     # Create the main directory for storing csv projects
     PATH_CSV.mkdir(parents=True, exist_ok=True)
 
