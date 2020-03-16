@@ -1,1 +1,0 @@
-__author__ = <str> import os import sys import pybedtools def run ( ) : if __name__ == <str> :      totalbedgraph1 = <str> totalbedgraph2 = <str>   

@@ -1,1 +1,0 @@
-from openerp import models , fields class product_category ( models . Model ) :      _inherit = <str> property_account_sale_early_payment_disc = fields . Many2one ( <str> , <str> , help = <str> , company_dependent = True )  class ProductTemplate ( models . Model ) :      _inherit = <str> without_early_payment = fields . Boolean ( <str> )   

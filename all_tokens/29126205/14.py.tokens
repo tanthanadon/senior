@@ -1,1 +1,0 @@
-import subprocess subprocess . call ( [ autocorr_routine , map1fn , params . apodsigma , params . apodtype , params . thetamax , nlmax , weightsA , CLAA , AAOUT , beamA , fskyfile , finalfile , kernelfn , params . ellmin , params . ellmax , params . nbins ] )  

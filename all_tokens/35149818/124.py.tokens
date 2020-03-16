@@ -1,1 +1,0 @@
-import heapq class Solution :      def topk ( self , nums , k ) :          heap = [ ] for n in nums :              heapq . heappush ( heap , n ) if len ( heap ) > k :                  heapq . heappop ( heap )   heap . sort ( reverse = True ) return heap    

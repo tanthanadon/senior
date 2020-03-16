@@ -1,1 +1,0 @@
-import socket hostname , sld , tld , port = <str> , <str> , <str> , 80 target = <str> . format ( hostname , sld , tld ) client = socket . socket ( socket . AF_INET , socket . SOCK_STREAM ) client . connect ( ( <str> , 9999 ) ) client . send ( <str> . format ( sld , tld ) ) response = client . recv ( 4096 ) print response  

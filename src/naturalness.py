@@ -16,6 +16,8 @@ import logging
 import multiprocessing as mp
 from multiprocessing_logging import install_mp_handler
 
+import tqdm
+
 language = "python"
     
 # Statis Paths
@@ -109,7 +111,7 @@ def prepareToken(PATH_PYTHON, PATH_TOKEN, projectID):
     d = {}
     tokenID = 0
     pairDirList = []
-    for file in files:
+    for file in tqdm.tqdm(list(files), desc="Preparing Token Files"):
         # Create token file for each .py file
         pairDirList = createTokenFile(file, target, tokenID)
         tokenID = tokenID + 1
@@ -218,7 +220,7 @@ def run():
     # Loop for all directories
     # check each item is a directory or not
     logging.basicConfig(filename='run.log', filemode='w', level=logging.ERROR)
-    for PATH_PYTHON in  PATH_SAMPLE.iterdir():
+    for PATH_PYTHON in  tqdm.tqdm(list(PATH_SAMPLE.iterdir())):
         # dict_token = {}
         #print(PATH_PYTHON)
         if PATH_PYTHON.is_dir():

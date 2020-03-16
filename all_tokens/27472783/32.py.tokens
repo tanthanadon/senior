@@ -1,1 +1,0 @@
-from genestack_client import Application class FileInitializer ( Application ) :      APPLICATION_ID = <str> def initialize ( self , accessions ) :          self . invoke ( <str> , accessions )  def load_info ( self , accessions ) :          return self . invoke ( <str> , accessions )    

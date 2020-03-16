@@ -65,57 +65,34 @@ def totalCommitsAuthor(project_id):
             FROM commits, users
             WHERE commits.project_id IN ({0}) 
             AND users.id = commits.author_id 
-            AND users.deleted != 1 AND users.fake != 1
             GROUP BY commits.project_id, author_id
             """.format(project_id)
     df = query(q)
     print(df)
-    df.to_csv("{0}/10000/totalCommitsAuthor.csv".format(PATH_CSV), index=False)
+    df.to_csv("{0}/totalCommitsAuthor.csv".format(PATH_CSV), index=False)
 
 def totalCommitsProject(project_id):
     q = """SELECT  commits.project_id, COUNT(commits.id) as total_commit_project
-            FROM commits, users
+            FROM commits
             WHERE commits.project_id IN ({0}) 
-            AND users.id = commits.author_id 
-            AND users.deleted != 1 AND users.fake != 1
             GROUP BY commits.project_id
             ORDER By commits.project_id""".format(project_id)
     df = query(q)
     print(df)
     df.to_csv("{0}/totalCommitsProject.csv".format(PATH_CSV), index=False)
 
-def dataSampling_953projects():
-    projects = pd.read_csv('../csv_368projects/dataSampling_comparedDate.csv')
-    # projects = pd.read_csv('../csv_953projects/dataSampling_inactive.csv')
-    projects = projects.loc[projects['comparedDate'] == True]
-    projects = projects.loc[projects['original_project'] == 'YES']
-    print(projects)
-    projects.to_csv("{0}/dataSampling_368projects.csv".format(PATH_CSV), index=False)
-
 def totalAuthorProject(project_id):
     q = """SELECT commits.project_id as id, COUNT(DISTINCT users.id) as total_author
             FROM users, commits
             WHERE commits.project_id  IN ({0}) 
             AND users.id = commits.author_id 
-            AND users.deleted != 1 AND users.fake != 1
             GROUP BY commits.project_id
             ORDER By commits.project_id""".format(project_id)
     df = query(q)
-    # projects = pd.read_csv('../csv_953projects/dataSampling_comparedDate.csv')
-    # projects = projects.loc[projects['comparedDate'] == True]
-    # print(projects)
-    projects = pd.read_csv('../csv_368projects/dataSampling_953projects.csv')
-    # projects = pd.read_csv('../csv_953projects/dataSampling_inactive.csv')
-    merged = pd.merge(df, projects, on='id', how='right')
-    merged = merged.replace(np.nan, 0)
-    merged['total_author'] = merged['total_author'].astype(int)
-    merged = merged.loc[merged['total_author'] != 0]
-    merged = merged.loc[merged['original_project'] == 'YES']
-    print(merged)
-    merged.to_csv("{0}/dataSampling_368projects.csv".format(PATH_CSV), index=False)
 
-    merged = merged[['id', 'total_author']]
-    merged.to_csv("{0}/totalAuthor.csv".format(PATH_CSV), index=False)
+    df = df[['id', 'total_author']]
+    print(df)
+    df.to_csv("{0}/totalAuthor.csv".format(PATH_CSV), index=False)
 
 def majorMinor(project_id):
     totalCommitsProject = pd.read_csv("{0}/totalCommitsProject.csv".format(PATH_CSV))
@@ -146,19 +123,19 @@ def majorMinor(project_id):
 
     df.to_csv("{0}/majorMinor.csv".format(PATH_CSV), index=False)
 
-def ownership(project_id):
-    df = pd.read_csv("{0}/majorMinor.csv".format(PATH_CSV))
-    max = (df.groupby(['project_id']).agg({'percent': ['max']}))
-   
-    df = pd.merge(df, max['percent'], on='project_id')
-    
-    df.loc[df['percent'] >= df['max'], 'ownership'] = 'Yes' 
-    df.loc[df['percent'] < df['max'], 'ownership'] = 'No'
+def maxContribution(project_id):
+    totalCommitsProject = pd.read_csv("{0}/totalCommitsProject.csv".format(PATH_CSV))
+    totalCommitsAuthor = pd.read_csv("{0}/totalCommitsAuthor.csv".format(PATH_CSV))
 
-    df.rename(columns={"max": "max_ownership"}, inplace=True)
-    print(df)
+    df = totalCommitsAuthor.merge(totalCommitsProject, on='project_id')
+    df['max_contribution'] = (df['total_commit_author']/df['total_commit_project'])*100
 
-    df.to_csv("{0}/ownership.csv".format(PATH_CSV), index=False)
+
+    max = (df.groupby(['project_id']).agg({'max_contribution': 'max'}))
+    max.reset_index(inplace=True)
+    print(max)
+
+    max.to_csv("{0}/maxContribution.csv".format(PATH_CSV), index=False)
 
 def changeNoExpert(project_id):
     df = pd.read_csv("{0}/majorMinor.csv".format(PATH_CSV))
@@ -245,102 +222,10 @@ def convertTime(df):
     # print(df)
     return pd.DataFrame(temp, columns=['differenttime'])
 
-def mergeDF(sample, target):
-    merged = pd.merge(sample, target, on='id', how='right')
+def merge(sample, target):
+    merged = pd.merge(sample, target, on='project_id', how='left')
     merged = merged.replace(np.nan, 0)
-    merged['fork_count'] = merged['fork_count'].astype(int)
-    merged = merged[['id', 'fork_count']]
-
-def merged():
-
-    df = pd.read_csv('../csv/merged_naturalness_final.csv')
-    # df = pd.read_csv('../csv/merged_naturalness_order_mean_final.csv')
-    df1 = pd.read_csv('../csv/merged_wily_final.csv')
-    merged = df.merge(df1, on='project_id')
-
-    merged = merged[['project_id', 'order', 'cross-entropy', 'Maintainability Index', 'Lines of Code', 'Cyclomatic Complexity']]
-
-    print(merged)
-    merged.to_csv("{0}/merged_product.csv".format(PATH_CSV), index=False)
-    # merged.to_csv("{0}/merged_product_mean.csv".format(PATH_CSV), index=False)
-
-    merged = merged.drop('Lines of Code', 1)
-    merged = merged.drop('Cyclomatic Complexity', 1)
-
-    df2 = pd.read_csv('../csv/selfApprChange.csv')
-    df3 = pd.read_csv('../csv/withOutDiscussion.csv')
-    merged1 = merged.merge(df2, on='project_id')
-
-    merged1 = merged1.drop('total_selfApprChange', 1)
-    merged1 = merged1.drop('total_commit_project', 1)
-
-    merged1 = merged1.merge(df3, on='project_id')
-    merged1 = merged1.drop('numOfCommits', 1)
-    merged1 = merged1.drop('total_commit_project', 1)
-
-
-    # print(merged1)
-    # merged1.to_csv("{0}/merged_participation.csv".format(PATH_CSV), index=False)
-    # merged1.to_csv("{0}/merged_participation_mean.csv".format(PATH_CSV), index=False)
-
-    df4 = pd.read_csv('../csv/changeNoExpert.csv')
-    merged2 = merged.merge(df4, on='project_id')
-
-    merged2 = merged2.drop('total_commit_author_minor', 1)
-    merged2 = merged2.drop('total_commit_project', 1)
-
-    # print(merged2)
-    # merged2.to_csv("{0}/merged_expertise.csv".format(PATH_CSV), index=False)
-    # merged2.to_csv("{0}/merged_expertise_mean.csv".format(PATH_CSV), index=False)
-
-    df5 = pd.read_csv('../csv/PriorDefects.csv')
-
-
-
-    merged3 = pd.merge(merged, df5, left_on='project_id', right_on='repo_id', how='left')
-    merged3 = merged3.drop('action', 1)
-    merged3 =merged3.replace(np.nan, 0).astype(int)
-    merged3 = merged3.drop('repo_id', 1)
-
-    df6 = pd.read_csv('../csv/merged_churn_final.csv')
-    merged3 = merged3.merge(df6, on='project_id')
-    merged3 = merged3.drop('add', 1)
-    merged3 = merged3.drop('delete', 1)
-
-    # print(merged3)
-    # merged3.to_csv("{0}/merged_process.csv".format(PATH_CSV), index=False)
-    # merged3.to_csv("{0}/merged_process_mean.csv".format(PATH_CSV), index=False)
-
-    df7 = pd.read_csv('../csv/totalAuthorProject.csv')
-    df8 = pd.read_csv('../csv/ownership.csv')
-
-    merged4 = merged.merge(df7, on='project_id')
-    merged4 = merged4.merge(df8, on='project_id')
-
-    merged4 = merged4.drop('percent', 1)
-    merged4 = merged4.drop('contributor', 1)
-    merged4 = merged4.drop('author_id', 1)
-    merged4 = merged4.drop('total_commit_author', 1)
-    merged4 = merged4.drop('total_commit_project', 1)
-    merged4 = merged4.drop('ownership', 1)
-
-    # print(merged4)
-    # merged4.to_csv("{0}/merged_human.csv".format(PATH_CSV), index=False)
-    # merged4.to_csv("{0}/merged_human_mean.csv".format(PATH_CSV), index=False)
-
-def mergedZero():
-    df = pd.read_csv('../csv/changeNoExpert.csv')
-    df1 = pd.read_csv('../csv/selfApprChange.csv')
-    df2 = pd.read_csv('../csv/withOutDiscussion.csv')
-    df3 = pd.read_csv('../csv/priorDefects.csv')
-
-
-    merged = df.merge(df1, on='project_id')
-    merged = merged.merge(df2, on='project_id')
-    merged = merged.merge(df3, on='project_id')
-    merged = merged[['project_id', 'changeNoExpert', 'percent_selfApprChange', 'percent_withOutDiscussion', 'numOfPriorDefects' ]]
-    print(merged)
-    merged.to_csv("{0}/mergedZero.csv".format(PATH_CSV), index=False)
+    return merged
 
 def priorDefects(project_id):
     arr_project_id = [int(i) for i in project_id.split(',')] 
@@ -366,136 +251,84 @@ def priorDefects(project_id):
 
     merged.to_csv("{0}/priorDefects.csv".format(PATH_CSV), index=False)
 
-def getFork(project_id, df):
-    # print(df['url'])
-    temp = []
-    for i in df['url']:
-        URL = "{0}".format(i)
-        # print(URL)
-
-        # sending get request and saving the response as response object 
-        headers = {'Authorization': 'token 4fae0c5f5db3a6fe3c24cd9ff7a3581753513b44'}
-        r = requests.get(url = URL, headers=headers)
-        # print(r)
-        # extracting data in json format 
-        data = r.json()
-        # print(data)
-        # temp.insert(json_normalize(data))
-        # print(pd.DataFrame.from_dict(data), orient='index')
-        # temp.insert(data)
-        # print(data['stargazers_count'])
-        try:
-            temp.append(data['forks_count'])
-        except KeyError:
-            temp.append(-1)
-    # print(temp)
-    df['fork_count'] = temp
-    df = df[['id', 'fork_count']]
-    print(df)
-    df.to_csv("{0}/fork_count.csv".format(PATH_CSV), index=False)
-
-def mergedPullrequest(project_id):
-    q = """SELECT pull_requests.head_repo_id as id, COUNT(DISTINCT pull_request_history.pull_request_id) as mergedPullrequest_count, pull_request_history.action as action FROM pull_requests
-            INNER JOIN pull_request_history ON pull_requests.id = pull_request_history.pull_request_id
-            WHERE head_repo_id IN ({0}) 
-            AND action = "merged"
-            GROUP BY pull_requests.head_repo_id""".format(project_id)
-    df = query(q)
-    # print(df)
-    projects = pd.read_csv('../csv/dataSampling_1000.csv')
-    # print(projects)
-    merged = pd.merge(df, projects, on='id', how='right')
-    # merged = projects.merge(df, on='id')
-    # df = projects.merge(df, on='id')
-    merged = merged.replace(np.nan, 0)
-    merged['mergedPullrequest_count'] = merged['mergedPullrequest_count'].astype(int)
-    merged = merged[['id', 'mergedPullrequest_count', 'action']]
-    print(merged)
-    df.to_csv("{0}/mergedPullrequest.csv".format(PATH_CSV), index=False)
-
-def openPullrequest(project_id):
-    q = """SELECT pull_requests.head_repo_id as id, COUNT(DISTINCT pull_request_history.pull_request_id) as openPullrequest_count, pull_request_history.action FROM pull_requests
+def openPullrequest(project_id, sample):
+    q = """SELECT pull_requests.head_repo_id as project_id, COUNT(DISTINCT pull_request_history.pull_request_id) as openPullrequest_count, pull_request_history.action FROM pull_requests
             INNER JOIN pull_request_history ON pull_requests.id = pull_request_history.pull_request_id
             WHERE head_repo_id IN ({0}) 
             AND action = "opened"
             GROUP BY pull_requests.head_repo_id""".format(project_id)
     df = query(q)
-    # print(df)
-    projects = pd.read_csv('../csv/dataSampling_1000.csv')
-    # print(projects)
-    merged = pd.merge(df, projects, on='id', how='right')
-    # merged = projects.merge(df, on='id')
-    # df = projects.merge(df, on='id')
-    merged = merged.replace(np.nan, 0)
+    merged = merge(sample, df)
     merged['openPullrequest_count'] = merged['openPullrequest_count'].astype(int)
-    merged = merged[['id', 'openPullrequest_count', 'action']]
+    merged = merged[['project_id', 'openPullrequest_count']]
     print(merged)
-    df.to_csv("{0}/openPullrequest.csv".format(PATH_CSV), index=False)
+    merged.to_csv("{0}/openPullrequest.csv".format(PATH_CSV), index=False)
 
-def closedPullrequest(project_id):
-    q = """SELECT pull_requests.head_repo_id as id, COUNT(DISTINCT pull_request_history.pull_request_id) as closedPullrequest_count, pull_request_history.action as action FROM pull_requests
+def mergedPullrequest(project_id, sample):
+    q = """SELECT pull_requests.head_repo_id as project_id, COUNT(DISTINCT pull_request_history.pull_request_id) as mergedPullrequest_count, pull_request_history.action as action FROM pull_requests
+            INNER JOIN pull_request_history ON pull_requests.id = pull_request_history.pull_request_id
+            WHERE head_repo_id IN ({0}) 
+            AND action = "merged"
+            GROUP BY pull_requests.head_repo_id""".format(project_id)
+    df = query(q)
+    merged = merge(sample, df)
+    merged['mergedPullrequest_count'] = merged['mergedPullrequest_count'].astype(int)
+    merged = merged[['project_id', 'mergedPullrequest_count']]
+    print(merged)
+    merged.to_csv("{0}/mergedPullrequest.csv".format(PATH_CSV), index=False)
+
+def closedPullrequest(project_id, sample):
+    q = """SELECT pull_requests.head_repo_id as project_id, COUNT(DISTINCT pull_request_history.pull_request_id) as closedPullrequest_count, pull_request_history.action as action FROM pull_requests
             INNER JOIN pull_request_history ON pull_requests.id = pull_request_history.pull_request_id
             WHERE head_repo_id IN ({0}) 
             AND action = "closed"
             GROUP BY pull_requests.head_repo_id""".format(project_id)
     df = query(q)
-    # print(df)
-    projects = pd.read_csv('../csv/dataSampling_1000.csv')
-    # print(projects)
-    merged = pd.merge(df, projects, on='id', how='right')
-    # merged = projects.merge(df, on='id')
-    # df = projects.merge(df, on='id')
-    merged = merged.replace(np.nan, 0)
+    merged = merge(sample, df)
     merged['closedPullrequest_count'] = merged['closedPullrequest_count'].astype(int)
-    merged = merged[['id', 'closedPullrequest_count', 'action']]
+    merged = merged[['project_id', 'closedPullrequest_count']]
     print(merged)
-    df.to_csv("{0}/closedPullrequest.csv".format(PATH_CSV), index=False)
+    merged.to_csv("{0}/closedPullrequest.csv".format(PATH_CSV), index=False)
 
-def closedIssue(project_id):
-    q = """SELECT issues.repo_id as id, COUNT(DISTINCT issues.id) as closedIssue_count , issue_events.action FROM issues 
-            INNER JOIN issue_events ON issue_events.issue_id = issues.id
-            WHERE issues.repo_id IN ({0}) 
-            AND issue_events.action = "closed"
-            GROUP BY issues.repo_id, issue_events.action""".format(project_id)
-    df = query(q)
-    # print(df)
-    projects = pd.read_csv('../csv/dataSampling_1000.csv')
-    # print(projects)
-    merged = pd.merge(df, projects, on='id', how='right')
-    # merged = projects.merge(df, on='id')
-    # df = projects.merge(df, on='id')
-    merged = merged.replace(np.nan, 0)
-    merged['closedIssue_count'] = merged['closedIssue_count'].astype(int)
-    merged = merged[['id', 'closedIssue_count', 'action']]
-    print(merged)
-    df.to_csv("{0}/closedIssue.csv".format(PATH_CSV), index=False)
-
-def openIssue(project_id):
-    q = """SELECT issues.repo_id as id, COUNT(DISTINCT issues.id) as openIssue_count FROM issues 
+def openIssue(project_id, sample):
+    q = """SELECT issues.repo_id as project_id, COUNT(DISTINCT issues.id) as openIssue_count FROM issues 
             INNER JOIN issue_events ON issue_events.issue_id = issues.id
             WHERE issues.repo_id IN ({0}) 
             AND issue_events.action != "closed"
             GROUP BY issues.repo_id""".format(project_id)
     df = query(q)
     # print(df)
-    projects = pd.read_csv('../csv/dataSampling_1000.csv')
-    # print(projects)
-    merged = pd.merge(df, projects, on='id', how='right')
-    # merged = projects.merge(df, on='id')
-    # df = projects.merge(df, on='id')
-    merged = merged.replace(np.nan, 0)
+    merged = merge(sample, df)
     merged['openIssue_count'] = merged['openIssue_count'].astype(int)
-    merged = merged[['id', 'openIssue_count']]
+    merged = merged[['project_id', 'openIssue_count']]
     print(merged)
-    df.to_csv("{0}/openIssue.csv".format(PATH_CSV), index=False)
+    merged.to_csv("{0}/openIssue.csv".format(PATH_CSV), index=False)
 
-def fork(project_id):
-    q = """SELECT forked_from as id, COUNT(DISTINCT id) as fork_count FROM projects WHERE forked_from IN ({0}) 
+def closedIssue(project_id, sample):
+    q = """SELECT issues.repo_id as project_id, COUNT(DISTINCT issues.id) as closedIssue_count , issue_events.action FROM issues 
+            INNER JOIN issue_events ON issue_events.issue_id = issues.id
+            WHERE issues.repo_id IN ({0}) 
+            AND issue_events.action = "closed"
+            GROUP BY issues.repo_id""".format(project_id)
+    df = query(q)
+    # print(df)
+    merged = merge(sample, df)
+    merged['closedIssue_count'] = merged['closedIssue_count'].astype(int)
+    merged = merged[['project_id', 'closedIssue_count']]
+    print(merged)
+    merged.to_csv("{0}/closedIssue.csv".format(PATH_CSV), index=False)
+
+def fork(project_id, sample):
+    q = """SELECT forked_from as project_id, COUNT(DISTINCT id) as fork_count FROM projects WHERE forked_from IN ({0}) 
             GROUP BY forked_from""".format(project_id)
     df = query(q)
-    
+
+    merged = merge(sample, df)
+    merged['fork_count'] = merged['fork_count'].astype(int)
+    merged = merged[['project_id', 'fork_count']]
     print(merged)
-    df.to_csv("{0}/fork.csv".format(PATH_CSV), index=False)
+    
+    merged.to_csv("{0}/fork.csv".format(PATH_CSV), index=False)
 
 def getHTML(api_url):
     URL = "{0}".format(api_url)
@@ -598,14 +431,6 @@ def maxDaysWithoutCommits(project_id):
 
     df['max_day_diff'] = ls
  
-    # df = df.agg('max')
-
-    # df['max_day_diff'] = df['day_diff'].agg('max')
-    
-    
-    # print(df)
-    # df = pd.DataFrame(df)
-    # print(df.groupby("project_id").max())
     result = df.groupby("project_id").max()
     # result = result[['max_day_diff']]
     result.reset_index(inplace=True)
@@ -626,7 +451,7 @@ if __name__ == "__main__":
     # totalCommitsProject(project_id)
     # totalAuthorProject(project_id)
     # majorMinor(project_id)
-    # ownership(project_id)
+    maxContribution(project_id)
     # changeNoExpert(project_id)
     # selfApprChange(project_id)
     # withoutDiscussion(project_id)
@@ -643,17 +468,17 @@ if __name__ == "__main__":
     # getFork(project_id, df)
     # union()
 
-    # mergedPullrequest(project_id)
 
-    # openPullrequest(project_id)
-    # fork(project_id)
+    # fork(project_id, df)
 
-    # closedPullrequest(project_id)
-    # closedIssue(project_id)
-    # openIssue(project_id)
+    openIssue(project_id, df)
+    closedIssue(project_id, df)
 
-    maxDaysWithoutCommits(project_id)
-    
+    openPullrequest(project_id, df)
+    mergedPullrequest(project_id, df)
+    closedPullrequest(project_id, df)
+
+    # maxDaysWithoutCommits(project_id)
 
 
 print("--- %s seconds ---" % (time.time() - start_time))

@@ -1,1 +1,0 @@
-class Solution :      def climbStairs ( self , n ) :          if n < 0 :              return 0  if n == 0 :              return 1  if n <= 2 :              return n  prev_prev , prev = 1 , 2 result = None for i in xrange ( 2 , n ) :              result = prev + prev_prev prev_prev = prev prev = result  return result    

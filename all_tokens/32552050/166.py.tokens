@@ -1,1 +1,0 @@
-from django . conf . urls import url from . views import sendSettings , serve_snippet urlpatterns = [ url ( <str> , sendSettings , name = <str> ) , url ( <str> , serve_snippet , name = <str> ) ]   

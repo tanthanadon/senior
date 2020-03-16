@@ -1,1 +1,0 @@
-<str> from uuid import ( UUID , uuid1 , uuid3 , uuid4 , uuid5 , getnode , NAMESPACE_DNS , NAMESPACE_URL , NAMESPACE_OID , NAMESPACE_X500 , ) def str_uuid ( random = False ) :      fn = uuid4 if random else uuid1 return str ( fn ( ) )   

@@ -1,1 +1,0 @@
-from django . contrib import admin from . models import Activity , Message class ActivityAdmin ( admin . ModelAdmin ) :      list_display = ( <str> , <str> , <str> )  class MessageAdmin ( admin . ModelAdmin ) :      list_display = ( <str> , <str> , <str> , <str> )  admin . site . register ( Activity , ActivityAdmin ) admin . site . register ( Message , MessageAdmin )  

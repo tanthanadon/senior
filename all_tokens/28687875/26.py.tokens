@@ -1,1 +1,0 @@
-def process ( tr , parameters , tableBuilder ) :    user = parameters . get ( <str> ) if not user == None :      tr . setUserId ( user )  sampleID = parameters . get ( <str> ) sample = tr . getSampleForUpdate ( sampleID ) properties = parameters . get ( <str> ) for prop in properties . keySet ( ) :   	 sample . setPropertyValue ( prop , properties . get ( prop ) )    

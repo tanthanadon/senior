@@ -1,0 +1,1 @@
+import logging import unittest if __name__ == <str> :    logging . basicConfig ( level = logging . CRITICAL ) unittest . main ( )   

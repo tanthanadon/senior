@@ -1,1 +1,0 @@
-from openerp import models , fields class ResPartnerBank ( models . Model ) :      _inherit = <str> active = fields . Boolean ( <str> , default = True )   

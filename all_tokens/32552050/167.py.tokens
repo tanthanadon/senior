@@ -1,1 +1,0 @@
-from django import forms from . models import * from djmanager . utils import content_type_is_subclass_of import gfklookupwidget class GenericSettingBlockForm ( forms . ModelForm ) :      class Meta :          model = GenericSettingBlock fields = [ ]    

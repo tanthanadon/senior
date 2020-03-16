@@ -1,1 +1,0 @@
-from odoo import models , fields class FdbImgMfg ( models . Model ) :      _name = <str> _description = <str> _inherits = { <str> : <str> } manufacturer_id = fields . Many2one ( string = <str> , comodel_name = <str> , required = True , ondelete = <str> , )   

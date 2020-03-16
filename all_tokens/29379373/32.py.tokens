@@ -1,1 +1,0 @@
-def init_actions_ ( service , args ) :      return { <str> : [ <str> ] }  def test ( job ) :      pass   

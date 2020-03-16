@@ -1,1 +1,0 @@
-from django . db import migrations class Migration ( migrations . Migration ) :      dependencies = [ ( <str> , <str> ) , ] operations = [ migrations . AlterModelOptions ( name = <str> , options = { } , ) , migrations . AlterModelOptions ( name = <str> , options = { } , ) , migrations . AlterModelOptions ( name = <str> , options = { } , ) , ]   

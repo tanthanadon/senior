@@ -1,1 +1,0 @@
-import base64 , sys for line in sys . stdin : 	 if len ( sys . argv ) > 1 : 		 if sys . argv [ 1 ] == <str> : 			 s1 = line b1 = s1 . encode ( <str> ) d = base64 . b85decode ( b1 ) s2 = d . decode ( <str> ) print ( s2 )   else : 		 s = line b = s . encode ( <str> ) e = base64 . b85encode ( b ) s1 = e . decode ( <str> ) print ( s1 )    

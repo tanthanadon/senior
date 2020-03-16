@@ -1,1 +1,0 @@
-from tsfc . driver import compile_form , compile_expression_at_points from tsfc . parameters import default_parameters try :      from firedrake_citations import Citations Citations ( ) . add ( <str> , ) del Citations  except ImportError :      pass   

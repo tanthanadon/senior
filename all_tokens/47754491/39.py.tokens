@@ -1,1 +1,0 @@
-test_str = <str> print ( <str> + str ( test_str ) ) res = <str> . join ( format ( i , <str> ) for i in bytearray ( test_str , encoding = <str> ) ) print ( <str> + str ( res ) )  

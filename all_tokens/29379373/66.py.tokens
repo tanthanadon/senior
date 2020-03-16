@@ -1,1 +1,0 @@
-def input ( job ) :      args = job . model . args if <str> in args :          args [ <str> ] = args [ <str> ] del args [ <str> ]  return args  def init ( job ) :      service = job . service os_actor = service . aysrepo . actorGet ( <str> ) os_actor . serviceCreate ( service . name , args = { <str> : service . name , <str> : service . model . data . sshkey } )   

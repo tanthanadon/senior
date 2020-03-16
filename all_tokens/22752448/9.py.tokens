@@ -1,0 +1,1 @@
+from lib . python import configuration connected_to_db = False def ConnectToDatabase ( ) :    global connected_to_db if not connected_to_db :      configuration . SetUpSqlobjectConnection ( ) connected_to_db = True    

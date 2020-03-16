@@ -1,1 +1,0 @@
-import odl space = odl . uniform_discr ( [ 0 , 0 ] , [ 1 , 1 ] , [ 100 , 100 ] ) phantom = odl . phantom . shepp_logan ( space , modified = True ) phantom . show ( ) phantom . show ( indices = [ None , 50 ] ) phantom . show ( coords = [ None , 0.5 ] ) phantom . show ( coords = [ [ None , 0.5 ] , None ] , force_show = True )  

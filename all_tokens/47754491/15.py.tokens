@@ -1,1 +1,0 @@
-import time from pykeyboard import PyKeyboard k = PyKeyboard ( ) print <str> time . sleep ( 2 ) k . tap_key ( <str> ) print <str> print <str> time . sleep ( 2 ) k . press_key ( k . alt_key ) k . press_key ( k . control_key ) k . tap_key ( k . function_keys [ 1 ] ) k . release_key ( k . alt_key ) k . release_key ( k . control_key )  

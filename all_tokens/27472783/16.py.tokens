@@ -1,1 +1,0 @@
-class Permissions ( object ) :      _JAVA_PKG = <str> FILE_ACCESS = _JAVA_PKG + <str> FILE_READ_CONTENT = _JAVA_PKG + <str> FILE_WRITE = _JAVA_PKG + <str> FILE_CLONE_DATA = _JAVA_PKG + <str>   

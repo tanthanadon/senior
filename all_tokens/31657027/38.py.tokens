@@ -1,1 +1,0 @@
-import numpy PARAMETERS = { <str> : <str> , <str> : <str> , <str> : <str> , <str> : 3 , <str> : <str> , <str> : numpy . finfo ( numpy . dtype ( <str> ) ) . precision , } def default_parameters ( ) :      return PARAMETERS . copy ( )  def is_complex ( scalar_type ) :      return scalar_type and <str> in scalar_type   

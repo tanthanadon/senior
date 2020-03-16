@@ -1,1 +1,0 @@
-import contextlib as _stdlib from contextlib import * __all__ = list ( getattr ( _stdlib , <str> , [ ] ) ) try :      redirect_stderr  except NameError :      from contextlib2 import redirect_stderr __all__ . append ( <str> )   

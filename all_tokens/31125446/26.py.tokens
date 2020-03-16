@@ -1,1 +1,0 @@
-__author__ = <str> def run ( protein_interactions ) :      with open ( protein_interactions ) as F :  if __name__ == <str> :      protein_interactions = <str> run ( protein_interactions )   

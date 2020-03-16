@@ -1,1 +1,0 @@
-from modeltranslation . translator import register , TranslationOptions from . models import TextTrial @ register ( TextTrial ) class HtmlStimTransOptions ( TranslationOptions ) :      fields = ( <str> , )    

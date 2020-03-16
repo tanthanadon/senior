@@ -1,1 +1,0 @@
-from music21 import * environment . set ( <str> , <str> ) converter . parse ( <str> ) . show ( )  

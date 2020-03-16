@@ -1,1 +1,0 @@
-from cloudant . _2to3 import PY2 LONG_NUMBER = PY2 and long ( 1 ) or 1  

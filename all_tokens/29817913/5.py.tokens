@@ -1,1 +1,0 @@
-from odoo import models , fields class FdbUnit ( models . Model ) :      _name = <str> _description = <str> _inherits = { <str> : <str> } uom_id = fields . Many2one ( string = <str> , comodel_name = <str> , ondelete = <str> , required = True , ) str30 = fields . Char ( ) str60 = fields . Char ( ) update_yn = fields . Boolean ( )   

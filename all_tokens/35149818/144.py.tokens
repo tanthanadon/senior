@@ -1,1 +1,0 @@
-class TwoSum ( object ) :      def __init__ ( self ) :          self . store = [ ]  def add ( self , number ) :          self . store . append ( number )  def find ( self , value ) :          d = set ( ) for n in self . store :              if ( value - n ) in d :                  return True  d . add ( n )  return False    

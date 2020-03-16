@@ -1,1 +1,0 @@
-from openerp import models , fields class ResPartner ( models . Model ) :      _inherit = <str> gd_id = fields . Many2one ( <str> , <str> ) discount_rate = fields . Float ( <str> , related = <str> , readonly = True )   

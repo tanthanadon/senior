@@ -1,1 +1,0 @@
-from allauth . account . forms import LoginForm def addLoginForm ( request ) :      loginForm = LoginForm ( ) loginForm . fields [ <str> ] . widget . attrs . update ( { <str> : <str> } ) loginForm . fields [ <str> ] . widget . attrs . update ( { <str> : <str> } ) loginForm . fields [ <str> ] . widget . attrs . update ( { <str> : <str> } ) return { <str> : loginForm }    

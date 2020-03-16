@@ -1,1 +1,0 @@
-from distutils . core import setup , Extension pyslsa_module = Extension ( <str> , include_dirs = [ <str> ] , library_dirs = [ <str> ] , libraries = [ <str> , <str> , <str> , <str> ] , sources = [ <str> ] ) setup ( name = <str> , version = <str> , ext_modules = [ pyslsa_module ] )   

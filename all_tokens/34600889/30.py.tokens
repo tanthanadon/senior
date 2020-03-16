@@ -1,1 +1,0 @@
-from django . contrib import admin from . models import Category , Keyword class CategoryAdmin ( admin . ModelAdmin ) :      list_display = ( <str> , <str> , <str> )  class KeywordAdmin ( admin . ModelAdmin ) :      list_display = ( <str> , <str> )  admin . site . register ( Category , CategoryAdmin ) admin . site . register ( Keyword , KeywordAdmin )  

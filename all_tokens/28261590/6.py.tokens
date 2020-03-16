@@ -1,1 +1,0 @@
-import warnings warnings . simplefilter ( action = <str> , category = RuntimeWarning ) warnings . simplefilter ( action = <str> , category = PendingDeprecationWarning ) from pygenometracks import plotTracks def main ( args = None ) :      plotTracks . main ( args )   

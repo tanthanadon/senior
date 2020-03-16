@@ -1,1 +1,0 @@
-from xoutil . modules import moduleproperty , modulemethod def echo ( what ) :      return what  @ moduleproperty def this ( self ) :      return self  def rien ( ) :      return 1  @ modulemethod def method ( self , * args , ** kwargs ) :      return self , args , kwargs  @ modulemethod def selfish ( self ) :      return self . selfish , selfish   

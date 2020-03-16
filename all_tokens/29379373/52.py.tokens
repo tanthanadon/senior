@@ -1,1 +1,0 @@
-def install ( job ) :      service = job . service cuisine = service . executor . cuisine clusterId = service . model . data . clusterId cuisine . apps . tidb . start ( ) cuisine . package . mdupdate ( ) cuisine . package . install ( <str> )   

@@ -1,1 +1,0 @@
-from django . core . management import BaseCommand from delft3dworker . models import Scene class Command ( BaseCommand ) :      help = <str> def handle ( self , * args , ** options ) :          fin_scenes = Scene . objects . filter ( phase = Scene . phases . fin ) for scene in fin_scenes :              scene . _local_scan_files ( )     

@@ -1,1 +1,0 @@
-from calendar import * import calendar as _stdlib __doc__ += _stdlib . __doc__ try :      __all__ = list ( _stdlib . __all__ )  except AttributeError :      pass  ( January , February , March , April , May , June , July , August , September , October , November , December , ) = range ( 1 , 13 )  

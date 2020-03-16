@@ -1,1 +1,0 @@
-def process ( tr , parameters , tableBuilder ) :    projCode = parameters . get ( <str> ) projSpace = parameters . get ( <str> ) projDesc = parameters . get ( <str> ) projId = <str> + projSpace + <str> + projCode + <str> proj = tr . createNewProject ( projId ) proj . setDescription ( projDesc )   

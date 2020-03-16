@@ -1,1 +1,0 @@
-class Cat ( object ) : 	 def garfield ( self ) : 		 print ( <str> ) return <str>   class Dog ( object ) : 	 def lessie ( self ) : 		 return <str>     

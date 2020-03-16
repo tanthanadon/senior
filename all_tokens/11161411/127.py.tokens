@@ -1,1 +1,0 @@
-import glob import os files = sorted ( glob . glob ( os . path . join ( <str> , <str> ) ) ) __all__ = [ <str> , <str> ] for file in files :      fname , ext = os . path . splitext ( os . path . basename ( file ) ) if fname != <str> :          __all__ . append ( fname )   for module in __all__ :      child_module = <str> + module __import__ ( child_module )   

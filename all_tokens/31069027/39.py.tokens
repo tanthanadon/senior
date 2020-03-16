@@ -1,1 +1,0 @@
-from openerp import models , fields , api , exceptions , _ class Website ( models . Model ) :      _inherit = <str> hubspot_url = fields . Char ( <str> )  class WebsiteConfig ( models . Model ) :      _inherit = <str> hubspot_url = fields . Char ( <str> , related = <str> )   

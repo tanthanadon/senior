@@ -1,1 +1,0 @@
-import odoo . addons . connector . backend as backend carepoint = backend . Backend ( <str> ) carepoint299 = backend . Backend ( parent = carepoint , version = <str> )  

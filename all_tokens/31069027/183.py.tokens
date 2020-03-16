@@ -1,1 +1,0 @@
-from openerp import models , fields class res_partner ( models . Model ) :      _inherit = <str> rappel_ids = fields . One2many ( <str> , <str> , <str> )   

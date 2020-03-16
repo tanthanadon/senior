@@ -1,0 +1,1 @@
+class Error ( Exception ) :     class StdoutSyntaxError ( Error ) :     class DatabaseContentsError ( Error ) :     class DataError ( Error ) :      

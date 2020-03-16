@@ -1,1 +1,0 @@
-from __future__ import unicode_literals from django . db import migrations , models import jsonfield . fields class Migration ( migrations . Migration ) :      dependencies = [ ( <str> , <str> ) , ] operations = [ migrations . AddField ( model_name = <str> , name = <str> , field = jsonfield . fields . JSONField ( default = dict , blank = True ) , ) , ]   

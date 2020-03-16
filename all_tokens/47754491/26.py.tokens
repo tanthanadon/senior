@@ -1,1 +1,0 @@
-import codecs , sys if len ( sys . argv ) > 1 :      if sys . argv [ 1 ] == <str> :          for line in sys . stdin :              print ( codecs . decode ( line , <str> ) )   if sys . argv [ 1 ] == <str> :          print ( <str> )   else :      for line in sys . stdin :          print ( codecs . encode ( line , <str> ) )    

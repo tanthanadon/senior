@@ -1,1 +1,0 @@
-from openerp . osv import orm , fields class account_business_line ( orm . Model ) :      _name = <str> _columns = { <str> : fields . char ( <str> , size = 128 , required = True ) , <str> : fields . text ( <str> ) }   

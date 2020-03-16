@@ -1,1 +1,0 @@
-import urllib2 , xbmc , re def main ( ) : 	 Label = xbmc . getInfoLabel ( <str> ) Label = re . sub ( <str> , <str> , Label ) . strip ( ) command = <str> + urllib2 . quote ( Label ) xbmc . executebuiltin ( <str> % command )  if __name__ == <str> : 	 main ( )    

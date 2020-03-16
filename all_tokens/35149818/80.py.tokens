@@ -1,1 +1,0 @@
-class Solution ( object ) :      def removeElements ( self , head , val ) :          if not head :              return None  dummy = ListNode ( 0 ) dummy . next = head prev , cur = dummy , head while cur :              if cur . val == val :                  prev . next = cur . next cur = cur . next  else :                  prev = cur cur = cur . next   return dummy . next    

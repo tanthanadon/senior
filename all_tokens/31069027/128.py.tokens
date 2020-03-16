@@ -1,1 +1,0 @@
-__name__ = ( <str> ) def migrate_risk_status_to_property ( cr ) :      cr . execute ( <str> ) for row in cr . fetchall ( ) :          cr . execute ( % row [ 0 ] )  cr . execute ( <str> )  def migrate ( cr , version ) :      if not version :          return  migrate_risk_status_to_property ( cr )   

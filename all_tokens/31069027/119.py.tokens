@@ -1,1 +1,0 @@
-from openerp import models , fields class ResPartner ( models . Model ) :      _inherit = <str> structure_id = fields . Many2one ( <str> , string = <str> , company_dependent = True )   

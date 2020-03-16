@@ -1,1 +1,0 @@
-from time import * from time import monotonic import time as _stdlib from xotl . tools . deprecation import deprecate_module deprecate_module ( replacement = monotonic . __module__ ) del deprecate_module  

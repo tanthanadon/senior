@@ -1,1 +1,0 @@
-from django . db . models . signals import post_save from django . dispatch import receiver from djuser . models import Subject from django . conf import settings @ receiver ( post_save , sender = settings . AUTH_USER_MODEL ) def createSubject ( sender , instance , created , ** kwargs ) :      if created :          record = Subject ( user = instance ) record . save ( )    

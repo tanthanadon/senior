@@ -1,1 +1,0 @@
-import mimetypes as _stdlib from mimetypes import * from xotl . tools . symbols import Unset def guess_type ( url , strict = True , default = ( None , None ) ) :      type , encoding = _stdlib . guess_type ( url , strict = strict ) if default is not Unset and type is None :          type , encoding = default  return type , encoding   

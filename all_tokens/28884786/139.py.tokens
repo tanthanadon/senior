@@ -1,1 +1,0 @@
-__author__ = [ <str> ] __license__ = <str> from nltk . tokenize . punkt import PunktLanguageVars class GreekLanguageVars ( PunktLanguageVars ) :      sent_end_chars = [ <str> , <str> , <str> ]   

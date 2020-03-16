@@ -1,1 +1,0 @@
-from django . conf . urls import url from . views import collect_all , learning_curve urlpatterns = [ url ( <str> , collect_all , name = <str> ) , url ( <str> , learning_curve , name = <str> ) ]   

@@ -1,1 +1,0 @@
-class Solution ( object ) :      def deleteDuplicates ( self , head ) :          if not head :              return None  cur = head while cur :              end = cur while end and end . val == cur . val :                  end = end . next  cur . next = end cur = end  return head    

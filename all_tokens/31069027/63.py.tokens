@@ -1,1 +1,0 @@
-from openerp import models , fields class resPartner ( models . Model ) :      _inherit = <str> valued_picking = fields . Boolean ( string = <str> , help = <str> <str> )   

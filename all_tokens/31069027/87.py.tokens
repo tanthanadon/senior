@@ -1,1 +1,0 @@
-from openerp import fields , models class AccountInvoice ( models . Model ) :      _inherit = <str> expense_line_ids = fields . One2many ( comodel_name = <str> , inverse_name = <str> , string = <str> )  class AccountInvoiceLine ( models . Model ) :      _inherit = <str> expense_line_ids = fields . One2many ( comodel_name = <str> , inverse_name = <str> , string = <str> )   

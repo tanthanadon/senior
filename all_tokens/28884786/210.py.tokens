@@ -1,1 +1,0 @@
-__author__ = [ <str> ] __license__ = <str> VOWELS = [ <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> ] CONSTANTS = [ <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> , <str> ] GRANTHA_CONSONANTS = [ <str> , <str> , <str> , <str> , <str> , <str> ]  

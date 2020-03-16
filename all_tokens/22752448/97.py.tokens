@@ -1,0 +1,1 @@
+import unittest from lib . python import database if __name__ == <str> :    unittest . main ( )   

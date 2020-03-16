@@ -1,1 +1,0 @@
-import odl import matplotlib . pyplot as plt import numpy as np n = 100 m = 20 space = odl . uniform_discr ( 0 , 5 , n ) elem = space . element ( np . sin ) fig = plt . figure ( ) plt . ylim ( - m , m ) for i in range ( m ) :      fig = ( elem * i ) . show ( fig = fig ) plt . pause ( 0.1 )  plt . show ( )  

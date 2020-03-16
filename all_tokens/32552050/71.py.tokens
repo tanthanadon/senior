@@ -1,1 +1,0 @@
-from . base import * IS_PRODUCTION = True DEBUG = True ALLOWED_HOSTS = [ <str> , <str> , <str> , <str> ] DEBUG = False prod_only_apps = [ ] INSTALLED_APPS . extend ( prod_only_apps ) DATABASES = { <str> : get_secret ( <str> ) } PAYPAL_MODE = <str> MEDIA_ROOT = os . path . normpath ( os . path . join ( <str> , <str> , <str> , <str> ) )  

@@ -1,1 +1,0 @@
-from PyQt5 . QtWidgets import QApplication from plots import moody from plots import standing from plots . heatTransfer import chartHE _all = { QApplication . translate ( <str> , <str> ) : ( standing . Standing_Katz , ) , QApplication . translate ( <str> , <str> ) : ( moody . Moody , ) , QApplication . translate ( <str> , <str> ) : chartHE } __all__ = [ <str> , <str> , <str> ]  

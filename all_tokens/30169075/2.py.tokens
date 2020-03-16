@@ -1,1 +1,0 @@
-from nose . tools import assert_raises from escpos . printer import Dummy def test_printer_dummy_clear ( ) :      printer = Dummy ( ) printer . text ( <str> ) printer . clear ( ) assert ( printer . output == <str> )   

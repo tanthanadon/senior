@@ -1,1 +1,0 @@
-class Solution ( object ) :      def getSum ( self , a , b ) :          if not a and not b :              return 0  if not a or not b :              return a or b  MASK , MAX = 0xFFFFFFFF , 0x7FFFFFFF while b != 0 :              carry = a & b a = ( a ^ b ) & MASK b = ( carry << 1 ) & MASK  return a if a <= MAX else ~ ( a ^ MASK )    
