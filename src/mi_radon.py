@@ -236,21 +236,24 @@ def dispatch_jobs(func, data):
 
 start_time = time.time()
 if __name__ == "__main__":
-    logging.basicConfig(filename='mi.log', filemode='w', level=logging.ERROR)
+    # logging.basicConfig(filename='mi.log', filemode='w', level=logging.ERROR)
         
-    sample = list(PATH_SAMPLE.iterdir())
-    dispatch_jobs(evaluate, sample)
+    # sample = list(PATH_SAMPLE.iterdir())
+    # dispatch_jobs(evaluate, sample)
 
-    # Drop the rows where at least one element is missing
-    original = pd.read_csv("{0}/{1}".format(PATH_CSV, "mi_original.csv"))
-    original.dropna(inplace=True)
-    print(original)
+    # # Drop the rows where at least one element is missing
+    # original = pd.read_csv("{0}/{1}".format(PATH_CSV, "mi_original.csv"))
+    # original.dropna(inplace=True)
+    # print(original)
 
-    # Average all metrics and calculate MI for each project
-    final = original.groupby('project_id').mean()
-    final.reset_index(inplace=True)
-    final['mi_mean'] = np.clip(100 * (171-(5.2*np.log(final['hv']))-(0.23*final['cc'])-(16.2*np.log(final['sloc'])))/171, 0, 100)
-    print(final)
-    final.to_csv("{0}/{1}".format(PATH_CSV, "mi_final.csv"), index=False)
+    # # Average all metrics and calculate MI for each project
+    # final = original.groupby('project_id').mean()
+    # final.reset_index(inplace=True)
+    # final['mi_mean'] = np.clip(100 * (171-(5.2*np.log(final['hv']))-(0.23*final['cc'])-(16.2*np.log(final['sloc'])))/171, 0, 100)
+    # print(final)
+    # final.to_csv("{0}/{1}".format(PATH_CSV, "mi_final.csv"), index=False)
+    f = open("/home/senior/senior/Sample_Projects/round_2/194154/python/Lib/test/test_threaded_import.py", "r")
+    print(f.read())
+    print(h_visit(f.read()))
 
 print("--- %s seconds ---" % (time.time() - start_time))

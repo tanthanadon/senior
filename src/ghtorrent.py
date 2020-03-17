@@ -82,7 +82,7 @@ def totalCommitsProject(project_id):
     df.to_csv("{0}/totalCommitsProject.csv".format(PATH_CSV), index=False)
 
 def totalAuthorProject(project_id):
-    q = """SELECT commits.project_id as id, COUNT(DISTINCT users.id) as total_author
+    q = """SELECT commits.project_id, COUNT(DISTINCT users.id) as total_author
             FROM users, commits
             WHERE commits.project_id  IN ({0}) 
             AND users.id = commits.author_id 
@@ -90,7 +90,7 @@ def totalAuthorProject(project_id):
             ORDER By commits.project_id""".format(project_id)
     df = query(q)
 
-    df = df[['id', 'total_author']]
+    df = df[['project_id', 'total_author']]
     print(df)
     df.to_csv("{0}/totalAuthor.csv".format(PATH_CSV), index=False)
 
@@ -435,13 +435,14 @@ def maxDaysWithoutCommits(project_id):
     # result = result[['max_day_diff']]
     result.reset_index(inplace=True)
     print(result)
+    result = result[['project_id', 'max_day_diff']]
     result.to_csv("{0}/maxDaysWithoutCommits.csv".format(PATH_CSV), index=False)
 
 
 start_time = time.time()
 if __name__ == "__main__":
     # Create the main directory for storing csv projects
-    df = pd.read_csv("{0}/{1}".format(PATH_CSV, "dataSampling_final.csv"))
+    df = pd.read_csv("{0}/{1}".format(PATH_CSV, "sample_repo.csv"))
     # df = pd.read_csv("{0}/{1}".format(PATH_CSV, "totalBytes.csv"), index_col=0)
     project_id = convertProjectID(df['project_id'])
     # dataSampling_953projects()
@@ -451,7 +452,7 @@ if __name__ == "__main__":
     # totalCommitsProject(project_id)
     # totalAuthorProject(project_id)
     # majorMinor(project_id)
-    maxContribution(project_id)
+    # maxContribution(project_id)
     # changeNoExpert(project_id)
     # selfApprChange(project_id)
     # withoutDiscussion(project_id)
@@ -471,14 +472,14 @@ if __name__ == "__main__":
 
     # fork(project_id, df)
 
-    openIssue(project_id, df)
-    closedIssue(project_id, df)
+    # openIssue(project_id, df)
+    # closedIssue(project_id, df)
 
-    openPullrequest(project_id, df)
-    mergedPullrequest(project_id, df)
-    closedPullrequest(project_id, df)
+    # openPullrequest(project_id, df)
+    # mergedPullrequest(project_id, df)
+    # closedPullrequest(project_id, df)
 
-    # maxDaysWithoutCommits(project_id)
+    maxDaysWithoutCommits(project_id)
 
 
 print("--- %s seconds ---" % (time.time() - start_time))
