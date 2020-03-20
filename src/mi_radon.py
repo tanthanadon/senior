@@ -21,7 +21,10 @@ import logging
 import multiprocessing as mp
 from multiprocessing_logging import install_mp_handler
 
-import codecs
+import subprocess
+import json
+
+import os
 
 # Paths of sample projeects
 PATH_SAMPLE = Path("../Sample_Projects/round_2/").resolve()
@@ -34,121 +37,151 @@ PATH_MI = Path("{0}/mi/".format(PATH_CSV)).resolve()
 # Create the main directory for cloning projects
 PATH_MI.mkdir(parents=True, exist_ok=True)
 
-BASE_CONFIG = Config(
-    exclude=r'test_[^.]+\.py',
-    ignore='tests,docs',
-    include_ipynb=False,
-    ipynb_cells=False,
-)
+timeOut = 10
 
-CC_CONFIG = Config(
-    order=getattr(cc_mod, 'SCORE'),
-    no_assert=False,
-    min='A',
-    max='F',
-    show_complexity=False,
-    show_closures=False,
-    average=True,
-    total_average=False,
-    **BASE_CONFIG.config_values
-)
+def calculateCC(path):
+    # print(path)
+    result = subprocess.check_output(['radon', 'cc', '--total-average', path], stderr= subprocess.STDOUT, timeout=timeOut)
+    # print(result.decode("utf-8"))
+    result_str = result.decode("utf-8")
+    if(len(result_str) > 0):
+        # Split the last line and collect the data
+        output = result_str.split("Average complexity: ")[-1].split(" ")
+        # print(result)
+        # Rank A - F
+        cc_rank = output[0]
+        # print(cc_rank)
+        # Remove (cc_score) -> cc_score and convert to float value
+        cc_score = float(output[1].replace("(", "").replace(")", "").strip())
+        # print(cc_score)
+    else:
+        cc_rank = np.NaN
+        cc_score = np.NaN
+    
+    # print({'cc_rank': cc_rank, 'cc_score': cc_score})
+    return {'cc_rank': cc_rank, 'cc_score': cc_score}
 
-RAW_CONFIG = Config(
-    summary=True,
-)
+def calculateHV(path):
+    # print(path)
+    result = subprocess.check_output(['radon', 'hal', '-j', path], stderr= subprocess.STDOUT, timeout=timeOut)
+    # print(result.decode("utf-8"))
+    result_str = result.decode("utf-8")
+    # print(stdout.decode("utf-8"))
 
-MI_CONFIG = Config(
-    multi=True,
-    min='B',
-    max='C',
-    show=True,
-    sort=False,
-)
+    # print(stderr)
+    x = result_str
+    js = json.loads(x)
 
-def calculateCC(code):
-    # Register the signal function handler
-    signal.signal(signal.SIGALRM, handler)
+    hal = js[path]['total']
+    
+    # print(hal)
 
-    # Define a timeout for your function (10 seconds)
-    signal.alarm(10)
+    # return array h1, h2, N1, N2, vocabulary, length, calculated_length, volume, difficulty, effort, time, bugs
+    # print({'h1': hal[0], 'h2': hal[1], 'N1': hal[2], 'N2': hal[3], 'vocabulary': hal[4], 'length': hal[5], 'calculated_length': hal[6], 'volume': hal[7], 'difficulty': hal[8], 'effort': hal[9], 'time': hal[10], 'bugs': hal[11]})
+    return {'h1': hal[0], 'h2': hal[1], 'N1': hal[2], 'N2': hal[3], 'vocabulary': hal[4], 'length': hal[5], 'calculated_length': hal[6], 'volume': hal[7], 'difficulty': hal[8], 'effort': hal[9], 'time': hal[10], 'bugs': hal[11]}
 
-    try:
-        arr = mi_parameters(code, count_multi=False)
-        CC = arr[1]
-        # print(mi_visit(txt, False))
-    except SyntaxError:
-        CC = -1
-    finally:
-        # Unregister the signal so it won't be triggered
-        # if the timeout is not reached.
-        signal.signal(signal.SIGALRM, signal.SIG_IGN)
-    return CC
+def calculateLOC(path):
+    result = subprocess.check_output(['radon', 'raw', '-j', path], stderr= subprocess.STDOUT, timeout=timeOut)
+    # print(result.decode("utf-8"))
+    result_str = result.decode("utf-8")
+    # print(stdout.decode("utf-8"))
 
-def calculateHV(code):
-    # Register the signal function handler
-    signal.signal(signal.SIGALRM, handler)
+    # print(stderr)
+    x = result_str
+    js = json.loads(x)
 
-    # Define a timeout for your function (10 seconds)
-    signal.alarm(10)
+    raw = js[path]
+    
+    # Return dict {'loc': 259, 'lloc': 151, 'single_comments': 48, 'sloc': 149, 'multi': 7, 'comments': 48, 'blank': 55}
+    return raw
 
-    try:
-        arr = mi_parameters(code, count_multi=False)
-        hv = arr[0]
-    except SyntaxError:
-        hv = -1
-    finally:
-        # Unregister the signal so it won't be triggered
-        # if the timeout is not reached.
-        signal.signal(signal.SIGALRM, signal.SIG_IGN)
-    return hv
 
-def calculateLOC(code):
-    # Register the signal function handler
-    signal.signal(signal.SIGALRM, handler)
+# def calculateCC(code):
+#     # Register the signal function handler
+#     signal.signal(signal.SIGALRM, handler)
 
-    # Define a timeout for your function (10 seconds)
-    signal.alarm(10)
+#     # Define a timeout for your function (10 seconds)
+#     signal.alarm(10)
 
-    try:
-        loc = analyze(code)
-        # Module(loc=209, lloc=75, sloc=128, comments=8, multi=36, blank=37, single_comments=8)
-        # sloc = loc[2]
-    except SyntaxError:
-        lst = [-1]
-        loc = list(itertools.chain.from_iterable(itertools.repeat(x, 7) for x in lst))
-    finally:
-        # Unregister the signal so it won't be triggered
-        # if the timeout is not reached.
-        signal.signal(signal.SIGALRM, signal.SIG_IGN)
-    return loc
+#     try:
+#         arr = mi_parameters(code, count_multi=False)
+#         CC = arr[1]
+#         # print(mi_visit(txt, False))
+#     except SyntaxError:
+#         CC = -1
+#     finally:
+#         # Unregister the signal so it won't be triggered
+#         # if the timeout is not reached.
+#         signal.signal(signal.SIGALRM, signal.SIG_IGN)
+#     return CC
 
-def calculatePercentComment(code):
-    # Register the signal function handler
-    signal.signal(signal.SIGALRM, handler)
+# def calculateHV(code, file):
+#     # Register the signal function handler
+#     signal.signal(signal.SIGALRM, handler)
 
-    # Define a timeout for your function (10 seconds)
-    signal.alarm(10)
+#     # Define a timeout for your function (10 seconds)
+#     signal.alarm(10)
 
-    try:
-        arr = mi_parameters(code, count_multi=False)
-        # Convert percent to radian
-        percent = arr[3]*0.06283
-    except SyntaxError:
-        percent = -1
-    finally:
-        # Unregister the signal so it won't be triggered
-        # if the timeout is not reached.
-        signal.signal(signal.SIGALRM, signal.SIG_IGN)
-    return percent
+#     try:
+#         arr = mi_parameters(code, count_multi=False)
+#         hv = arr[0]
+#     except SyntaxError:
+#         hv = -1
+#         print(str(file))
+#     finally:
+#         # Unregister the signal so it won't be triggered
+#         # if the timeout is not reached.
+#         signal.signal(signal.SIGALRM, signal.SIG_IGN)
+#     return hv
 
-def calculateMI(hv, cc, sloc, percent):
-    if(hv > 0 and cc > 0 and sloc > 0 and percent > -1):
-        real_mi = np.clip(100 * (171-(5.2*np.log(hv))-(0.23*cc)-(16.2*np.log(sloc)))/171, 0, 100)
+# def calculateLOC(code):
+#     # Register the signal function handler
+#     signal.signal(signal.SIGALRM, handler)
+
+#     # Define a timeout for your function (10 seconds)
+#     signal.alarm(10)
+
+#     try:
+#         loc = analyze(code)
+#         # Module(loc=209, lloc=75, sloc=128, comments=8, multi=36, blank=37, single_comments=8)
+#         # sloc = loc[2]
+#     except SyntaxError:
+#         lst = [-1]
+#         loc = list(itertools.chain.from_iterable(itertools.repeat(x, 7) for x in lst))
+#     finally:
+#         # Unregister the signal so it won't be triggered
+#         # if the timeout is not reached.
+#         signal.signal(signal.SIGALRM, signal.SIG_IGN)
+#     return loc
+
+# def calculatePercentComment(code):
+#     # Register the signal function handler
+#     signal.signal(signal.SIGALRM, handler)
+
+#     # Define a timeout for your function (10 seconds)
+#     signal.alarm(10)
+
+#     try:
+#         arr = mi_parameters(code, count_multi=False)
+#         # Convert percent to radian
+#         percent = arr[3]*0.06283
+#     except SyntaxError:
+#         percent = -1
+#     finally:
+#         # Unregister the signal so it won't be triggered
+#         # if the timeout is not reached.
+#         signal.signal(signal.SIGALRM, signal.SIG_IGN)
+#     return percent
+
+def calculateMI(hv, cc, sloc):
+    if(hv != np.NaN and cc != np.NaN and sloc != np.NaN):
+        real_mi = np.clip(100 * (171-(5.2*np.log(hv+1))-(0.23*cc)-(16.2*np.log(sloc+1)))/171, 0, 100)
         # print("MI:")
-        # print(100 * (171-(5.2*np.log(hv))-(0.23*cc)-(16.2*np.log(sloc))+(50*np.sin(np.sqrt(2.4*percent))))/171)
+        # print(100 * (171-(5.2*np.log(hv))-(0.23*cc)-(16.2*np.log(sloc)))/171)
+        # print(real_mi)
         return real_mi
     else:
-        return -1
+        return np.NaN
 
 def mergeFile(path_project):
     path = Path(path_project)
@@ -166,47 +199,65 @@ def handler(signum, frame):
 
 def evaluate(path_project):
     temp = []
-    logging.basicConfig(filename='evaluate.log', filemode='w', level=logging.ERROR)
 
     # merge = mergeFile(path_project)
     project_id = path_project.name
     files = path_project.rglob("[A-Za-z0-9]*.py")
 
-    for file in files:
-        # print(file)
-        try:
-            code = file.read_text(encoding='ISO-8859-1')
-            hv = calculateHV(code)
-            # hv = func_timeout(10, calculateHV, args=code)
-            cc = calculateCC(code)
-            # cc = func_timeout(10, calculateCC, args=code)
+    # print(project_id)
+    for file in tqdm.tqdm(list(files), desc="File Level: {0}".format(project_id)):
+        print(file)
+        if(file.is_file()):
+            try:
+                path = "{0}".format(file)
+                # print(path)
+                hv = calculateHV(path)
+                # hv = func_timeout(10, calculateHV, args=code)
+                cc = calculateCC(path)
+                # print(cc)
+                # # cc = func_timeout(10, calculateCC, args=code)
 
-            all_loc = calculateLOC(code)
-            # all_loc = func_timeout(10, calculateLOC, args=code)
+                raw = calculateLOC(path)
+                # # all_loc = func_timeout(10, calculateLOC, args=code)
 
-            loc = all_loc[0]
-            lloc = all_loc[1]
-            sloc = all_loc[2]
-            mutli_string = all_loc[3]
-            blank = all_loc[4]
-            single_comment = all_loc[5]
+                # loc = all_loc[0]
+                # lloc = all_loc[1]
+                # sloc = all_loc[2]
+                # mutli_string = all_loc[3]
+                # blank = all_loc[4]
+                # single_comment = all_loc[5]
 
-            percent = calculatePercentComment(code)
-            # percent = func_timeout(10, calculatePercentComment, args=code)
+                # percent = calculatePercentComment(code)
+                # # percent = func_timeout(10, calculatePercentComment, args=code)
 
-            real_mi = calculateMI(hv, cc, sloc, percent)
-            # print(real_mi)
-
-            d = {'project_id': path_project.name, 'hv': hv, 'cc': cc, 'loc': loc, 'lloc': lloc, 'sloc': sloc, 'multi_string': mutli_string, 'single_comment': single_comment, 'blank': blank, 'percent': percent, 'mi': real_mi, 'path': str(file)}
-            # print(d)
-            temp.append(d)
-        except Exception as e:
-            logging.error("[{0}] project_id: {1}, path: {2}".format(e, project_id, file))
-            pass
+                real_mi = calculateMI(hv['volume'], cc['cc_score'], raw['sloc'])
+                # print(hv['volume'], cc['cc_score'], raw['sloc'])
+                # print(real_mi)
+                # print(file)
                 
-    df = pd.DataFrame(temp, columns=['project_id', 'hv', 'cc', 'sloc', 'percent', 'path']).sort_values('project_id', ascending=True)
+                
+                d = {'project_id': path_project.name}
+                d.update(hv)
+                d.update(cc)
+                d.update(raw)
+                d.update({'mi': real_mi})
+                d.update({'path': path})
+                temp.append(d)
+                # logging.info("project_id: {0}, path: {1}".format(project_id, file))
+                # print(d)
+            except OSError as os:
+                logging.error("[{0}], project_id: {1}, path: {2}".format(os, project_id, file))
+            except Exception as e:
+                logging.error("[{0}], project_id: {1}, path: {2}".format(e, project_id, file))
+                pass
+        else:
+            logging.error("[{0}], project_id: {1}, path: {2}".format("This is not a file", project_id, file))
+            pass
+                    
+    df = pd.DataFrame.from_dict(temp)
     # print(df)
     df.to_csv("{0}/{1}.csv".format(PATH_MI, project_id), index=False)
+    # print("########### Finish Calculating MI project: {0} ############".format(project_id))
     return df
 
 def dispatch_jobs(func, data):
@@ -223,25 +274,79 @@ def dispatch_jobs(func, data):
     install_mp_handler()
 
     with mp.Pool(processes=numberOfCores) as pool:
-        max_ = len(data)
-        with tqdm.tqdm(total=max_) as pbar:
-            result = pool.imap_unordered(func, data)
-            for i, _ in enumerate(result):
-                pbar.update()
-            # result = pool.map(func, data)
-            pool.close()
-            pool.join()
-            result.to_csv("{0}/{1}".format(PATH_CSV, "mi_original.csv"), index=False)
+        result = pool.map(func, data)
+        pool.close()
+        pool.join()
+        result.to_csv("{0}/{1}".format(PATH_CSV, "mi_original.csv"), index=False)
     print("########### Dispatch jobs Finished ############")
+
+def contain(id, df):
+    flag = False
+    for id in df['project_id']:
+            if(id == project_id):
+                # print(path_project.name)
+                flag = True
+    return flag
 
 start_time = time.time()
 if __name__ == "__main__":
-    # logging.basicConfig(filename='mi.log', filemode='w', level=logging.ERROR)
-        
+    logging.basicConfig(filename='mi_rerun.log', filemode='w', level=logging.ERROR)
+
+    # f = open("/home/senior/senior/Sample_Projects/round_2/22752448/csw/mgar/gar/v2/lib/python/testdata/javasvn_stats.py", "r")
+    # code = f.read()
+    # path = "/home/senior/senior/Sample_Projects/round_2/3780176/SublimeCodeIntel.py"
+    # # calculateHV(path)
+    # calculateCC(path)
+    # calculateLOC(path)
+
     # sample = list(PATH_SAMPLE.iterdir())
     # dispatch_jobs(evaluate, sample)
 
-    # # Drop the rows where at least one element is missing
+    # Rerun
+    
+    rerun = pd.read_csv("/home/senior/senior/src/mi_rerun.csv")
+    for path_project in tqdm.tqdm(list(PATH_SAMPLE.iterdir()), desc="Project Level", total=len(rerun)):
+        project_id = int(path_project.name)
+        temp = []
+        if(contain(project_id, rerun)):
+            for dirpath, dirs, files in os.walk("{0}".format(path_project)):
+                for filename in tqdm.tqdm(list(files), desc="File Level: {0}".format(project_id)):
+                    python = os.path.join(dirpath,filename)
+                    # print(python)
+                    if(python.endswith(".py")):
+                        try:
+                            path = "{0}".format(python)
+                            # print(path)
+                            hv = calculateHV(path)
+                            # hv = func_timeout(10, calculateHV, args=code)
+                            cc = calculateCC(path)
+                            # print(cc)
+                            # # cc = func_timeout(10, calculateCC, args=code)
+
+                            raw = calculateLOC(path)
+                            # # all_loc = func_timeout(10, calculateLOC, args=code)
+
+                            real_mi = calculateMI(hv['volume'], cc['cc_score'], raw['sloc'])
+
+                            d = {'project_id': path_project.name}
+                            d.update(hv)
+                            d.update(cc)
+                            d.update(raw)
+                            d.update({'mi': real_mi})
+                            d.update({'path': path})
+                            temp.append(d)
+                            # logging.info("project_id: {0}, path: {1}".format(project_id, file))
+                            # print(d)
+                        except OSError as os:
+                            logging.error("[{0}], project_id: {1}, path: {2}".format(os, project_id, python))
+                        except Exception as e:
+                            logging.error("[{0}], project_id: {1}, path: {2}".format(e, project_id, python))
+        # print(temp)
+        df = pd.DataFrame.from_dict(temp)
+        # print(df)
+        df.to_csv("{0}/{1}.csv".format(PATH_MI, project_id), index=False)
+
+    # Drop the rows where at least one element is missing
     # original = pd.read_csv("{0}/{1}".format(PATH_CSV, "mi_original.csv"))
     # original.dropna(inplace=True)
     # print(original)
@@ -252,8 +357,8 @@ if __name__ == "__main__":
     # final['mi_mean'] = np.clip(100 * (171-(5.2*np.log(final['hv']))-(0.23*final['cc'])-(16.2*np.log(final['sloc'])))/171, 0, 100)
     # print(final)
     # final.to_csv("{0}/{1}".format(PATH_CSV, "mi_final.csv"), index=False)
-    f = open("/home/senior/senior/Sample_Projects/round_2/194154/python/Lib/test/test_threaded_import.py", "r")
-    print(f.read())
-    print(h_visit(f.read()))
+    # f = open("/home/senior/senior/Sample_Projects/round_2/194154/python/Lib/test/test_threaded_import.py", "r")
+    # print(f.read())
+    # print(h_visit(f.read()))
 
 print("--- %s seconds ---" % (time.time() - start_time))

@@ -112,10 +112,11 @@ def prepareToken(PATH_PYTHON, PATH_TOKEN, projectID):
     tokenID = 0
     pairDirList = []
     for file in tqdm.tqdm(list(files), desc="Preparing Token Files"):
-        # Create token file for each .py file
-        pairDirList = createTokenFile(file, target, tokenID)
-        tokenID = tokenID + 1
-        d[pairDirList[0]] = pairDirList[1]
+        if(file.is_file()):
+            # Create token file for each .py file
+            pairDirList = createTokenFile(file, target, tokenID)
+            tokenID = tokenID + 1
+            d[pairDirList[0]] = pairDirList[1]
     print("############## Tokenization for "+PATH_PYTHON+" finished ################")
     # return d
     

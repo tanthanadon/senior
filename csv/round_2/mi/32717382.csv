@@ -1,14 +1,1 @@
-project_id,hv,cc,sloc,percent,path
-32717382,12.0,3,26,4.8330769230769235,/home/senior/senior/Sample_Projects/round_2/32717382/setup.py
-32717382,82.0447025077789,8,75,2.3456533333333334,/home/senior/senior/Sample_Projects/round_2/32717382/kaptan5/kaptan.py
-32717382,0.0,4,60,2.0943333333333327,/home/senior/senior/Sample_Projects/round_2/32717382/kaptan5/libkaptan/ui_menu.py
-32717382,79.95445336320968,17,147,0.940312925170068,/home/senior/senior/Sample_Projects/round_2/32717382/kaptan5/libkaptan/ui_avatar.py
-32717382,13.931568569324174,10,92,1.3658695652173913,/home/senior/senior/Sample_Projects/round_2/32717382/kaptan5/libkaptan/ui_mouse.py
-32717382,84.0,22,137,1.0089489051094889,/home/senior/senior/Sample_Projects/round_2/32717382/kaptan5/libkaptan/ui_theme.py
-32717382,0.0,4,65,1.933230769230769,/home/senior/senior/Sample_Projects/round_2/32717382/kaptan5/libkaptan/ui_other.py
-32717382,129.65784284662087,23,313,0.4215431309904153,/home/senior/senior/Sample_Projects/round_2/32717382/kaptan5/libkaptan/tabwidget.py
-32717382,122.9848878378053,21,109,1.1528440366972477,/home/senior/senior/Sample_Projects/round_2/32717382/kaptan5/libkaptan/ui_wallpaper.py
-32717382,0.0,2,28,4.487857142857143,/home/senior/senior/Sample_Projects/round_2/32717382/kaptan5/libkaptan/ui_welcome.py
-32717382,230.62385799360038,18,105,1.5557904761904762,/home/senior/senior/Sample_Projects/round_2/32717382/kaptan5/libkaptan/ui_summary.py
-32717382,0.0,2,6,20.943333333333335,/home/senior/senior/Sample_Projects/round_2/32717382/kaptan5/libkaptan/ui_pm.py
-32717382,458.78103884255074,34,141,1.693290780141844,/home/senior/senior/Sample_Projects/round_2/32717382/kaptan5/libkaptan/tools.py
+

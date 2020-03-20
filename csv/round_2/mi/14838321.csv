@@ -1,0 +1,2 @@
+project_id,h1,h2,N1,N2,vocabulary,length,calculated_length,volume,difficulty,effort,time,bugs,cc_rank,cc_score,loc,lloc,single_comments,sloc,multi,comments,blank,mi,path
+14838321,8,34,18,36,42,54,196.97373660251156,291.18514083005306,4.235294117647059,1233.2547141037542,68.5141507835419,0.09706171361001768,A,3.14285714286,123,64,44,63,5,44,11,42.91276090715141,/home/senior/senior/Sample_Projects/round_2/14838321/@generate.py
