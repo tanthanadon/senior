@@ -198,62 +198,41 @@ def handler(signum, frame):
     raise Exception("Time Out!")
 
 def evaluate(path_project):
+    project_id = int(path_project.name)
     temp = []
+    for dirpath, dirs, files in tqdm.tqdm(list(os.walk("{0}".format(path_project))), desc="File Level: {0}".format(project_id)):
+        for filename in files:
+            python = os.path.join(dirpath,filename)
+            # print(python)
+            if(python.endswith(".py")):
+                try:
+                    path = "{0}".format(python)
+                    # print(path)
+                    hv = calculateHV(path)
+                    # hv = func_timeout(10, calculateHV, args=code)
+                    cc = calculateCC(path)
+                    # print(cc)
+                    # # cc = func_timeout(10, calculateCC, args=code)
 
-    # merge = mergeFile(path_project)
-    project_id = path_project.name
-    files = path_project.rglob("[A-Za-z0-9]*.py")
+                    raw = calculateLOC(path)
+                    # # all_loc = func_timeout(10, calculateLOC, args=code)
 
-    # print(project_id)
-    for file in tqdm.tqdm(list(files), desc="File Level: {0}".format(project_id)):
-        print(file)
-        if(file.is_file()):
-            try:
-                path = "{0}".format(file)
-                # print(path)
-                hv = calculateHV(path)
-                # hv = func_timeout(10, calculateHV, args=code)
-                cc = calculateCC(path)
-                # print(cc)
-                # # cc = func_timeout(10, calculateCC, args=code)
+                    real_mi = calculateMI(hv['volume'], cc['cc_score'], raw['sloc'])
 
-                raw = calculateLOC(path)
-                # # all_loc = func_timeout(10, calculateLOC, args=code)
-
-                # loc = all_loc[0]
-                # lloc = all_loc[1]
-                # sloc = all_loc[2]
-                # mutli_string = all_loc[3]
-                # blank = all_loc[4]
-                # single_comment = all_loc[5]
-
-                # percent = calculatePercentComment(code)
-                # # percent = func_timeout(10, calculatePercentComment, args=code)
-
-                real_mi = calculateMI(hv['volume'], cc['cc_score'], raw['sloc'])
-                # print(hv['volume'], cc['cc_score'], raw['sloc'])
-                # print(real_mi)
-                # print(file)
-                
-                
-                d = {'project_id': path_project.name}
-                d.update(hv)
-                d.update(cc)
-                d.update(raw)
-                d.update({'mi': real_mi})
-                d.update({'path': path})
-                temp.append(d)
-                # logging.info("project_id: {0}, path: {1}".format(project_id, file))
-                # print(d)
-            except OSError as os:
-                logging.error("[{0}], project_id: {1}, path: {2}".format(os, project_id, file))
-            except Exception as e:
-                logging.error("[{0}], project_id: {1}, path: {2}".format(e, project_id, file))
-                pass
-        else:
-            logging.error("[{0}], project_id: {1}, path: {2}".format("This is not a file", project_id, file))
-            pass
-                    
+                    d = {'project_id': path_project.name}
+                    d.update(hv)
+                    d.update(cc)
+                    d.update(raw)
+                    d.update({'mi': real_mi})
+                    d.update({'path': path})
+                    temp.append(d)
+                    # logging.info("project_id: {0}, path: {1}".format(project_id, file))
+                    # print(d)
+                except OSError as o:
+                    logging.error("[{0}], project_id: {1}, path: {2}".format(o, project_id, python))
+                except Exception as e:
+                    logging.error("[{0}], project_id: {1}, path: {2}".format(e, project_id, python))
+    # print(temp)
     df = pd.DataFrame.from_dict(temp)
     # print(df)
     df.to_csv("{0}/{1}.csv".format(PATH_MI, project_id), index=False)
@@ -274,13 +253,13 @@ def dispatch_jobs(func, data):
     install_mp_handler()
 
     with mp.Pool(processes=numberOfCores) as pool:
-        result = pool.map(func, data)
+        pool.map(func, data)
         pool.close()
         pool.join()
-        result.to_csv("{0}/{1}".format(PATH_CSV, "mi_original.csv"), index=False)
+        # result.to_csv("{0}/{1}".format(PATH_CSV, "mi_original.csv"), index=False)
     print("########### Dispatch jobs Finished ############")
 
-def contain(id, df):
+def contain(project_id, df):
     flag = False
     for id in df['project_id']:
             if(id == project_id):
@@ -288,22 +267,7 @@ def contain(id, df):
                 flag = True
     return flag
 
-start_time = time.time()
-if __name__ == "__main__":
-    logging.basicConfig(filename='mi_rerun.log', filemode='w', level=logging.ERROR)
-
-    # f = open("/home/senior/senior/Sample_Projects/round_2/22752448/csw/mgar/gar/v2/lib/python/testdata/javasvn_stats.py", "r")
-    # code = f.read()
-    # path = "/home/senior/senior/Sample_Projects/round_2/3780176/SublimeCodeIntel.py"
-    # # calculateHV(path)
-    # calculateCC(path)
-    # calculateLOC(path)
-
-    # sample = list(PATH_SAMPLE.iterdir())
-    # dispatch_jobs(evaluate, sample)
-
-    # Rerun
-    
+def rerun():
     rerun = pd.read_csv("/home/senior/senior/src/mi_rerun.csv")
     for path_project in tqdm.tqdm(list(PATH_SAMPLE.iterdir()), desc="Project Level", total=len(rerun)):
         project_id = int(path_project.name)
@@ -341,10 +305,25 @@ if __name__ == "__main__":
                             logging.error("[{0}], project_id: {1}, path: {2}".format(os, project_id, python))
                         except Exception as e:
                             logging.error("[{0}], project_id: {1}, path: {2}".format(e, project_id, python))
-        # print(temp)
-        df = pd.DataFrame.from_dict(temp)
-        # print(df)
-        df.to_csv("{0}/{1}.csv".format(PATH_MI, project_id), index=False)
+            # print(temp)
+            df = pd.DataFrame.from_dict(temp)
+            # print(df)
+            df.to_csv("{0}/{1}.csv".format(PATH_MI, project_id), index=False)
+
+start_time = time.time()
+if __name__ == "__main__":
+    logging.basicConfig(filename='mi.log', filemode='w', level=logging.ERROR)
+
+    # f = open("/home/senior/senior/Sample_Projects/round_2/22752448/csw/mgar/gar/v2/lib/python/testdata/javasvn_stats.py", "r")
+    # code = f.read()
+    # path = "/home/senior/senior/Sample_Projects/round_2/3780176/SublimeCodeIntel.py"
+    # # calculateHV(path)
+    # calculateCC(path)
+    # calculateLOC(path)
+
+    sample = list(PATH_SAMPLE.iterdir())
+    dispatch_jobs(evaluate, sample)
+    # print(findPython(Path("/home/senior/senior/Sample_Projects/round_2/22752448/")))
 
     # Drop the rows where at least one element is missing
     # original = pd.read_csv("{0}/{1}".format(PATH_CSV, "mi_original.csv"))

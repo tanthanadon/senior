@@ -1,1 +1,6 @@
-
+project_id,h1,h2,N1,N2,vocabulary,length,calculated_length,volume,difficulty,effort,time,bugs,cc_rank,cc_score,loc,lloc,single_comments,sloc,multi,comments,blank,mi,path
+19982733,13,77,41,79,90,120,530.6482799693416,779.022371559561,6.6688311688311686,5195.168672673176,288.62048181517645,0.259674123853187,B,8.0,283,138,48,185,10,56,40,29.166331205789252,/home/senior/senior/Sample_Projects/round_2/19982733/lemmata/collatinus/__convert.py
+19982733,1,22,11,22,23,33,98.10749561002054,149.27754454988144,0.5,74.63877227494072,4.146598459718929,0.04975918151662715,,,32,13,6,13,0,6,13,,/home/senior/senior/Sample_Projects/round_2/19982733/lemmata/backoff/latin_lemmatized_sentences.py
+19982733,1,24,12,24,25,36,110.03910001730776,167.17882283189007,0.5,83.58941141594504,4.643856189774724,0.05572627427729669,,,491,19,9,443,0,15,39,,/home/senior/senior/Sample_Projects/round_2/19982733/lemmata/backoff/latin_regexp_patterns.py
+19982733,2,6,12,24,8,36,17.509775004326936,108.0,4.0,432.0,24.0,0.036,,,70,56,2,43,0,2,25,,/home/senior/senior/Sample_Projects/round_2/19982733/lemmata/backoff/latin_model.py
+19982733,0,0,0,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,,,37,4,0,34,0,0,3,,/home/senior/senior/Sample_Projects/round_2/19982733/lemmata/backoff/latin_names_lookup.py

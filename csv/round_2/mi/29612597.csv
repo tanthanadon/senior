@@ -1,1 +1,2 @@
-
+project_id,h1,h2,N1,N2,vocabulary,length,calculated_length,volume,difficulty,effort,time,bugs,cc_rank,cc_score,loc,lloc,single_comments,sloc,multi,comments,blank,mi,path
+29612597,14,1442,969,1945,1456,2914,15185.442526714076,30619.713581539003,9.441747572815533,289103.6063888027,16061.311466044594,10.206571193846335,B,9.43103448276,2528,1549,342,1534,104,353,548,0.0,/home/senior/senior/Sample_Projects/round_2/29612597/gMusicUtility42.py
